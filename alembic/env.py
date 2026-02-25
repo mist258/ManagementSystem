@@ -13,7 +13,9 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "backend"))
 
 from core.config import settings
 from core.models import Base
-from api.users.models import User
+from api.users.models import User, UserProfile
+from api.articles.models import Article
+from api.auth.models import TokenBlacklist
 
 
 
