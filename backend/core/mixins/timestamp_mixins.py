@@ -1,4 +1,5 @@
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import DateTime, func
+from sqlalchemy.orm import mapped_column
 
 
 class TimestampMixin:
@@ -6,12 +7,12 @@ class TimestampMixin:
         Mixin class that adds timestamp column
         created_at, updated_at
     """
-    created_at = Column(
+    created_at = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False,
     )
-    updated_at = Column(
+    updated_at = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False,
