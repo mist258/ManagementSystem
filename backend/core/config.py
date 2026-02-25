@@ -24,6 +24,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="FASTAPI__",
+        extra="ignore",
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
