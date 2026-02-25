@@ -2,6 +2,7 @@ from core.models import Base
 from sqlalchemy import String, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from core.mixins import IdPkMixin, TimestampMixin
+from ..articles import Article
 
 
 class User(IdPkMixin, Base):
@@ -49,6 +50,10 @@ class UserProfile(IdPkMixin, TimestampMixin, Base):
     user: Mapped["User"] = relationship(
         "User",
          back_populates="profile"
+    )
+    articles: Mapped[list["Article"]] = relationship(
+        "Article",
+        back_populates="author"
     )
 
     def __str__(self):

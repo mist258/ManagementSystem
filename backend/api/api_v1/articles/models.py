@@ -1,9 +1,9 @@
-from sqlalchemy import String, Text, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, Text, Integer, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import Base
 from core.mixins import TimestampMixin, IdPkMixin
-
+from ..users import UserProfile
 
 class Article(IdPkMixin, TimestampMixin, Base):
     """
@@ -12,7 +12,18 @@ class Article(IdPkMixin, TimestampMixin, Base):
 
     title: Mapped[str] = mapped_column(String(70), index=True, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    author: Mapped["UserProfile"] = relationship(
+        "UserProfile",
+        back_populates="article"
+    )
+    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("user_profiles.id"), nullable=False)
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1) # field for optimistic locking
+
+    # SQLAlchemy indicates that the model supports optimistic locking via this column
+    # The version column will be automatically used by the ORM to check the row version on commit
+    __mapper_args__ = {
+        "version_id_col": version,
+    }
 
 
     def __str__(self):
