@@ -16,6 +16,7 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.47"}
 asyncpg = "^0.31.0"
 alembic = "^1.18.4"
 pyjwt = {extras = ["crypto"], version = "^2.11.0"}
+bcrypt = "^5.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
