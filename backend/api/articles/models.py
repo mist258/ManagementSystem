@@ -3,7 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import Base
 from core.mixins import TimestampMixin, IdPkMixin
-from ..users import UserProfile
+from api.users.models import UserProfile
+
 
 class Article(IdPkMixin, TimestampMixin, Base):
     """
@@ -24,7 +25,6 @@ class Article(IdPkMixin, TimestampMixin, Base):
     __mapper_args__ = {
         "version_id_col": version,
     }
-
 
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, title={self.title!r})"
