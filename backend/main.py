@@ -3,7 +3,8 @@ import uvicorn
 from api import router as api_router
 from core.config import settings
 from contextlib import asynccontextmanager
-
+import api.articles.models
+import api.users.models
 from core.models import db_helper
 
 
@@ -19,7 +20,7 @@ main_app = FastAPI(lifespan=lifespan)
 
 main_app.include_router(
     api_router,
-    prefix=settings.api.prefix,)
+    prefix=settings.api.prefix)
 
 if __name__ == "__main__":
     uvicorn.run("main:main_app",
