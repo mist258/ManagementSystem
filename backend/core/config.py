@@ -18,6 +18,7 @@ class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem" # directory "certs" should be created in root of the project (on the same level with Dockerfile and .env)
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
     algorithm: str = "RS256" # encryption algorithm
+    access_token_expire_minutes: int = 15
 
 
 class DatabaseConfig(BaseSettings):
