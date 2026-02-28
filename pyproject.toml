@@ -17,6 +17,7 @@ asyncpg = "^0.31.0"
 alembic = "^1.18.4"
 pyjwt = {extras = ["crypto"], version = "^2.11.0"}
 bcrypt = "^5.0.0"
+python-multipart = "^0.0.22"
 
 
 [tool.poetry.group.dev.dependencies]
