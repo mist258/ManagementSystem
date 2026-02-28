@@ -1,9 +1,11 @@
+from __future__ import annotations
 from sqlalchemy import String, Text, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from typing import TYPE_CHECKING
 from core.models import Base
 from core.mixins import TimestampMixin, IdPkMixin
-from api.users.models import UserProfile
+if TYPE_CHECKING:
+    from api.users.models import UserProfile
 
 
 class Article(IdPkMixin, TimestampMixin, Base):
@@ -15,9 +17,13 @@ class Article(IdPkMixin, TimestampMixin, Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     author: Mapped["UserProfile"] = relationship(
         "UserProfile",
-        back_populates="article"
+        back_populates="articles"
     )
-    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("user_profiles.id"), nullable=False)
+    author_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        "user_profiles.id",
+         ondelete="SET NULL"
+    ),
+        nullable=True)
     version: Mapped[int] = mapped_column(Integer, nullable=False, default=1) # field for optimistic locking
 
     # SQLAlchemy indicates that the model supports optimistic locking via this column

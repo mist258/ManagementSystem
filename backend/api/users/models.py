@@ -1,7 +1,12 @@
+from __future__ import annotations
 from core.models import Base
 from sqlalchemy import String, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 from core.mixins import IdPkMixin, TimestampMixin
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from api.articles.models import Article
 
 
 class User(IdPkMixin, Base):
@@ -15,14 +20,15 @@ class User(IdPkMixin, Base):
         unique=True,
         nullable=False
     )
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True) # "True" for all roles in system (if is_active=False -> soft deletion )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=False) # "True" for all roles in system (if is_active=False -> soft deletion )
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False) # "True" only for superuser
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False) # "True" for editor and superuser
 
     profile: Mapped["UserProfile"] = relationship(
         "UserProfile",
         back_populates="user",
-        uselist=False
+        uselist=False,
+        cascade="all, delete-orphan"
     )
 
     def __str__(self):
@@ -42,7 +48,10 @@ class UserProfile(IdPkMixin, TimestampMixin, Base):
 
     user_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+    ),
         unique=True,
         nullable=False
     )
@@ -52,7 +61,8 @@ class UserProfile(IdPkMixin, TimestampMixin, Base):
     )
     articles: Mapped[list["Article"]] = relationship(
         "Article",
-        back_populates="author"
+        back_populates="author",
+        passive_deletes = True
     )
 
     def __str__(self):
