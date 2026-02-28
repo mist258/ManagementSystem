@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 import jwt
 import bcrypt
 from core.config import settings
@@ -7,12 +8,30 @@ from core.config import settings
 def encode_jwt(
         payload: dict,
         private_key: str = settings.auth_jwt.private_key_path.read_text(),
-        algorithm: str = settings.auth_jwt.algorithm
+        algorithm: str = settings.auth_jwt.algorithm,
+        expire_timedelta: timedelta | None = None,
+        expire_minutes: int = settings.auth_jwt.access_token_expire_minutes
 ):
     """
         Create JWT token
     """
-    encoded = jwt.encode(payload, private_key, algorithm=algorithm) # generate token
+    to_encode = payload.copy()
+    now = datetime.utcnow()
+    if expire_timedelta:
+        expire = now + expire_timedelta
+
+    else:
+        expire = now + timedelta(minutes=expire_minutes)
+
+    to_encode.update(
+        exp=expire,
+        iat=now
+    )
+
+    encoded = jwt.encode(
+        to_encode,
+        private_key,
+        algorithm=algorithm) # generate token
     return encoded
 
 
@@ -37,12 +56,12 @@ def hash_password(password: str) -> str:
     return bcrypt.hashpw(pwd_bytes, salt).decode("utf-8")
 
 
-def validate_password(password: str, hashed_password: bytes) -> bool:
+def validate_password(password: str, hashed_password: str) -> bool:
     """
         Check the match of the received password with the hashed password
     """
     return bcrypt.checkpw(
-        password.encode(), hashed_password
+        password.encode(), hashed_password.encode()
     )
 
 

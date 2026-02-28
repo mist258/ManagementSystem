@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, ConfigDict
+from pydantic import BaseModel, field_validator, ConfigDict, EmailStr
 import re
 
 class SetPasswordSchema(BaseModel):
@@ -17,4 +17,14 @@ class SetPasswordSchema(BaseModel):
                                   '1 special symbol, 1 letter, 1 number')
         return password
 
+# for user login
+class UserLoginSchema(BaseModel):
+    id: int
+    email: EmailStr
+    password: str
+
+# schema for token
+class TokenInfoSchema(BaseModel):
+    access_token: str
+    token_type: str
 
