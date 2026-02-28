@@ -98,7 +98,7 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     return user
 
 
-async def update_user(data: UserCreateSchema, db: AsyncSession, user_id: int, ) -> User: # demo version will rewrite todo
+async def update_user(data: UserCreateSchema, db: AsyncSession, user_id: int, ) -> User: # todo demo version will rewrite, have problem with password
     """
         can update: admin & account's owner
     """
