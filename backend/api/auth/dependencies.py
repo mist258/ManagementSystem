@@ -8,7 +8,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .utils import validate_password, decode_jwt
 from api.users.models import User, UserProfile
 from api.users.schemas import UserRetrieveSchema
-
+from .services import ACCESS_TOKEN_TYPE, validate_token_type, REFRESH_TOKEN_TYPE
 
 http_bearer = HTTPBearer()
 
@@ -47,16 +47,17 @@ async def get_current_token_payload(
     token = credentials.credentials
     try:
         payload = decode_jwt(token=token)
-    except InvalidTokenError as e:
+    except InvalidTokenError:
        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                           detail=f"Invalid token")
+                           detail="Invalid token")
     return payload
 
-# todo can be something wrong with articles
-async def get_current_auth_user(
-        payload: dict = Depends(get_current_token_payload),
-        db: AsyncSession = Depends(db_helper.session_getter)
-) -> User:
+
+async def get_user_by_token_sub(
+        payload: dict,
+        db: AsyncSession
+) -> UserRetrieveSchema:
+
     user_id = payload.get("sub")
 
     if not user_id:
@@ -67,7 +68,7 @@ async def get_current_auth_user(
         .options(
             joinedload(User.profile)
             .selectinload(UserProfile.articles)
-            )
+        )
         .where(User.id == int(user_id)))
     )
 
@@ -76,9 +77,28 @@ async def get_current_auth_user(
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="User not found")
-
     return user
 
+# access token
+# todo can be something wrong with articles
+async def get_current_auth_user(
+        payload: dict = Depends(get_current_token_payload),
+        db: AsyncSession = Depends(db_helper.session_getter)
+):
+    validate_token_type(payload, ACCESS_TOKEN_TYPE)
+    return await get_user_by_token_sub(payload, db)
+
+
+# refresh token
+async def get_current_auth_user_for_refresh(
+        payload: dict = Depends(get_current_token_payload),
+        db: AsyncSession = Depends(db_helper.session_getter)
+):
+    validate_token_type(payload, REFRESH_TOKEN_TYPE)
+    return await get_user_by_token_sub(payload, db)
+
+
+# check is user authorized
 async def get_current_active_user(
     user: UserRetrieveSchema = Depends(get_current_auth_user)
 ):
@@ -86,3 +106,5 @@ async def get_current_active_user(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Inactive user")
     return user
+
+

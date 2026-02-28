@@ -1,28 +1,53 @@
 from fastapi import APIRouter, Depends
 from starlette import status
-
-from .utils import encode_jwt
+from .services import (create_access_token,
+                       create_refresh_token)
 from .schemas import UserLoginSchema, TokenInfoSchema
-from .dependencies import validate_auth_user, get_current_active_user
+from .dependencies import (validate_auth_user,
+                           get_current_active_user,
+                           get_current_auth_user_for_refresh,)
 from api.users.schemas import UserRetrieveSchema
 
 
 auth_router = APIRouter()
 
 @auth_router.post("/login", response_model=TokenInfoSchema, status_code=status.HTTP_200_OK)
-async def user_login(
+def user_login(
         user: UserLoginSchema = Depends(validate_auth_user),
 ):
-    jwt_payload = {
-        "sub": str(user.id),
-        "email": user.email,
-    }
-    token = encode_jwt(jwt_payload)
+    access_token = create_access_token(user)
+    refresh_token = create_refresh_token(user)
+
     return TokenInfoSchema(
-        access_token=token,
-        token_type="Bearer",
+        access_token=access_token,
+        refresh_token=refresh_token,
     )
 
 @auth_router.get("/me", response_model=UserRetrieveSchema, status_code=status.HTTP_200_OK)
-async def current_user(user: UserRetrieveSchema = Depends(get_current_active_user)):
+def current_user(user: UserRetrieveSchema = Depends(get_current_active_user)):
     return user
+
+
+@auth_router.post("/refresh", response_model=TokenInfoSchema, status_code=status.HTTP_200_OK)
+def user_refresh(
+        user: UserLoginSchema = Depends(get_current_auth_user_for_refresh)
+):
+    access_token = create_access_token(user)
+    refresh_token = create_refresh_token(user)
+
+    return TokenInfoSchema(
+        access_token=access_token,
+        refresh_token=refresh_token,
+    )
+
+
+
+
+
+
+
+
+
+
+
+
