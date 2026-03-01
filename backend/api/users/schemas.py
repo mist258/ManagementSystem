@@ -15,6 +15,8 @@ class UserRetrieveSchema(BaseModel):
     id: int
     email: EmailStr
     is_active: bool
+    is_staff: bool
+    is_superuser: bool
     profile: UserProfileRetrieveSchema
 
 # for editor
@@ -22,7 +24,6 @@ class EditorProfileRetrieveSchema(BaseModel):
     id: int
     first_name: str
     last_name: str
-
 
 class EditorRetrieveSchema(BaseModel):
     id: int
@@ -40,7 +41,7 @@ class UserProfileSchema(BaseModel):
 
 class UserCreateSchema(BaseModel):
     email: EmailStr
-    hashed_password: str # todo validation
+    hashed_password: str
     profile: UserProfileSchema
 
     @field_validator('email')
@@ -61,6 +62,19 @@ class UserCreateSchema(BaseModel):
             raise ValueError('Password must contain at least 8 characters,'
                                     '1 special symbol, 1 letter, 1 number')
         return password
+
+# update user
+class UserUpdateSchema(BaseModel):
+    email: EmailStr
+    profile: UserProfileSchema
+
+    @field_validator('email')
+    @classmethod
+    def normalize_email(cls, email: EmailStr) -> EmailStr:
+
+        email_name, domain_part = email.strip().rsplit('@', 1)
+        email = email_name + "@" + domain_part.lower()
+        return email
 
 # for blocking & unblocking users
 class UserBlockUnblockSchema(BaseModel):
