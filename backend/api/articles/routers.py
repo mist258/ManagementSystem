@@ -1,6 +1,5 @@
-from typing import List
-
-from fastapi import APIRouter, status, Depends
+from typing import List, Sequence
+from fastapi import APIRouter, status, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.articles.schemas import (ArticleCreateSchema,
                                   ArticleUpdateSchema,
@@ -11,11 +10,13 @@ from api.users.dependencies import (require_user_and_superuser,
                                     require_article_owner_or_staff,
                                     require_article_owner_or_admin,
                                     )
+from .enums import ArticleSortField, SortOrder
 from .services import (create_article,
                        update_article,
                        delete_article,
                        get_all_articles,
-                       get_article_by_id)
+                       get_article_by_id,
+                       search_articles)
 from utils.pagination import PaginationDep
 
 
@@ -55,7 +56,22 @@ async def get_articles(pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter)):
     return await get_all_articles(pagination=pagination, db=db)
 
+@article_router.get("/search", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
+async def get_articles(pagination: PaginationDep,
+                       db: AsyncSession = Depends(db_helper.session_getter),
+                       search: str | None = Query(None, description="Search for articles"),
+                       sort_by: ArticleSortField = Query(ArticleSortField.created_at),
+                       sort_order: SortOrder = Query(SortOrder.desc),
+) -> Sequence[ArticleFullResponseSchema]:
+    return await search_articles(
+        db=db,
+        pagination=pagination,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order)
+
 
 @article_router.get("/{article_id}", response_model=ArticleFullResponseSchema, status_code=status.HTTP_200_OK )
 async def get_single_article_by_id(article_id: int, db: AsyncSession = Depends(db_helper.session_getter)):
     return await get_article_by_id(db, article_id)
+

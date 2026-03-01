@@ -1,12 +1,13 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, Sequence
 from sqlalchemy.orm.exc import StaleDataError
-
+from .enums import ArticleSortField, SortOrder
 from api.articles.models import Article
 from api.users.models import User
 from api.articles.schemas import ArticleCreateSchema, ArticleUpdateSchema
 from utils.pagination import PaginationDep
+from sqlalchemy import asc, desc
 
 
 async def create_article(
@@ -96,7 +97,7 @@ async def get_article_by_id(
         db:AsyncSession,
         article_id: int) -> Article:
     """
-         can get: anyone
+    can get: anyone
     """
     result = await db.execute(
         select(Article)
@@ -110,4 +111,32 @@ async def get_article_by_id(
     return article
 
 
-# todo search users and articles
+async def search_articles(
+        db:AsyncSession,
+        pagination: PaginationDep,
+        search: str | None = None,
+        sort_by: ArticleSortField = ArticleSortField.created_at,
+        sort_order: SortOrder = SortOrder.desc,
+) -> Sequence[Article]:
+    """
+    can get: anyone
+    """
+
+    stmt = select(Article)
+
+    if search:
+        stmt = stmt.where(Article.title.ilike(f"%{search}%"))
+
+    sort_column = getattr(Article, sort_by.value)
+
+    if sort_order == SortOrder.desc:
+        stmt = stmt.order_by(desc(sort_column))
+    else:
+        stmt = stmt.order_by(asc(sort_column))
+
+    stmt = stmt.limit(pagination.limit).offset(pagination.offset)
+
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
