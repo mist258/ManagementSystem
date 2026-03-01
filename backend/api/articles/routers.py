@@ -1,25 +1,21 @@
 from typing import List, Sequence
-from fastapi import APIRouter, status, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from api.articles.schemas import (ArticleCreateSchema,
-                                  ArticleUpdateSchema,
-                                  ArticleFullResponseSchema)
-from core.models import db_helper
+
+from api.articles.schemas import ArticleCreateSchema, ArticleFullResponseSchema, ArticleUpdateSchema
+from api.users.dependencies import (
+    require_article_owner_or_admin,
+    require_article_owner_or_staff,
+    require_user_and_superuser,
+)
 from api.users.models import User
-from api.users.dependencies import (require_user_and_superuser,
-                                    require_article_owner_or_staff,
-                                    require_article_owner_or_admin,
-                                    )
-from .enums import ArticleSortField, SortOrder
-from .services import (create_article,
-                       update_article,
-                       delete_article,
-                       get_all_articles,
-                       get_article_by_id,
-                       search_articles)
+from core.models import db_helper
 from utils.pagination import PaginationDep
 
+from fastapi import APIRouter, Depends, Query, status
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from .enums import ArticleSortField, SortOrder
+from .services import create_article, delete_article, get_all_articles, get_article_by_id, search_articles, update_article
 
 article_router = APIRouter()
 

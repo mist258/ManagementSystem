@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
+
 # for user login
 class UserLoginSchema(BaseModel):
     id: int

@@ -1,9 +1,12 @@
 from __future__ import annotations
-from core.models import Base
-from sqlalchemy import String, Boolean, Integer, ForeignKey
-from sqlalchemy.orm import Mapped, relationship, mapped_column
-from core.mixins import IdPkMixin, TimestampMixin
+
 from typing import TYPE_CHECKING
+
+from core.mixins import IdPkMixin, TimestampMixin
+from core.models import Base
+
+from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from api.articles.models import Article

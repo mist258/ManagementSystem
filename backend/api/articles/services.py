@@ -1,13 +1,15 @@
-from fastapi import HTTPException, status, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, Sequence
-from sqlalchemy.orm.exc import StaleDataError
-from .enums import ArticleSortField, SortOrder
 from api.articles.models import Article
-from api.users.models import User
 from api.articles.schemas import ArticleCreateSchema, ArticleUpdateSchema
+from api.users.models import User
 from utils.pagination import PaginationDep
-from sqlalchemy import asc, desc
+
+from fastapi import HTTPException, status
+
+from sqlalchemy import Sequence, asc, desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.exc import StaleDataError
+
+from .enums import ArticleSortField, SortOrder
 
 
 async def create_article(

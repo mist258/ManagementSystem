@@ -1,7 +1,10 @@
-from typing import List
 import re
-from pydantic import BaseModel, EmailStr, field_validator
+from typing import List
+
 from api.articles.schemas import ArticleTitleSchema
+
+from pydantic import BaseModel, EmailStr, field_validator
+
 
 # for casual user
 class UserProfileRetrieveSchema(BaseModel):

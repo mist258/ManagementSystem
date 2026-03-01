@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends
-from starlette import status
-from .services import (create_access_token,
-                       create_refresh_token)
-from .schemas import UserLoginSchema, TokenInfoSchema
-from .dependencies import (validate_auth_user,
-                           get_current_active_user,
-                           get_current_auth_user_for_refresh,)
 from api.users.schemas import UserRetrieveSchema
+from starlette import status
 
+from fastapi import APIRouter, Depends
+
+from .dependencies import (
+    get_current_active_user,
+    get_current_auth_user_for_refresh,
+    validate_auth_user,
+)
+from .schemas import TokenInfoSchema, UserLoginSchema
+from .services import create_access_token, create_refresh_token
 
 auth_router = APIRouter()
 

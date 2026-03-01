@@ -1,7 +1,9 @@
 from typing import Annotated
 
 from fastapi import Depends
+
 from pydantic import BaseModel, Field
+
 
 class Pagination(BaseModel):
     limit: int = Field(10, gt=0, lt=15)

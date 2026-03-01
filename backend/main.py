@@ -1,12 +1,14 @@
-from fastapi import FastAPI, HTTPException, Depends
-import uvicorn
-from sqlalchemy.ext.asyncio import AsyncSession
-from api import router as api_router
-from core.config import settings
 from contextlib import asynccontextmanager
+
 import api.articles.models
 import api.users.models
+from api import router as api_router
+from core.config import settings
 from core.models import db_helper
+
+from fastapi import Depends, FastAPI, HTTPException
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @asynccontextmanager
@@ -19,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 main_app = FastAPI(lifespan=lifespan)
 from sqlalchemy import text
+
 
 # liveness endpoint
 @main_app.get("/health", tags=["health"])

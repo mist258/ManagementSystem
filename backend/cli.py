@@ -1,9 +1,12 @@
 import asyncio
+
 import click
-from sqlalchemy import select
 from api.auth.utils import hash_password
-from core.models.db_helper import db_helper
 from api.users.models import User, UserProfile
+from core.models.db_helper import db_helper
+
+from sqlalchemy import select
+
 
 @click.group()
 def cli():

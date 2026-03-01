@@ -1,15 +1,17 @@
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Sequence
-from fastapi import HTTPException
-from .schemas import UserCreateSchema, UserUpdateSchema
-from sqlalchemy.orm import joinedload
-from .models import User, UserProfile
-from sqlalchemy import select
+
 from api.auth.utils import hash_password
 from utils.pagination import PaginationDep
-from sqlalchemy import or_
 
+from fastapi import HTTPException
+
+from sqlalchemy import or_, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
+from .models import User, UserProfile
+from .schemas import UserCreateSchema, UserUpdateSchema
 
 
 async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
@@ -180,9 +182,6 @@ async def delete_user(db: AsyncSession,
                       user_id: int):
     """
         Delete user
-        :param: user_id
-        :return: None
-        :permission: admin
     """
     result = select(User).where(User.id == user_id)
     user = await db.scalar(result)
@@ -197,9 +196,6 @@ async def delete_user(db: AsyncSession,
 async def block_user(db: AsyncSession, user_id: int) -> User: # soft deletion
     """
         Deactivate user
-        :param: user_id
-        :return: blocked user
-        :permission: admin
     """
     result = await db.execute(
         select(User)
@@ -264,7 +260,6 @@ async def search_users_by_name(
         )
         .where(User.is_staff == False)
     )
-
     if search:
         stmt = stmt.where(
             or_(
@@ -272,7 +267,6 @@ async def search_users_by_name(
                 UserProfile.last_name.ilike(f"%{search}%")
             )
         )
-
     stmt = stmt.limit(pagination.limit).offset(pagination.offset)
     result = await db.execute(stmt)
     return result.unique().scalars().all()

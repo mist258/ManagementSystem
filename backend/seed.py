@@ -1,9 +1,10 @@
 import asyncio
+
 import click
-from core.models import db_helper
-from api.users.models import User, UserProfile
 from api.articles.models import Article
 from api.auth.utils import hash_password
+from api.users.models import User, UserProfile
+from core.models import db_helper
 
 
 async def _seed():

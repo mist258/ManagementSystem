@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class ArticleTitleSchema(BaseModel):
     id: int
     title: str
