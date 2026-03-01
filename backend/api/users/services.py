@@ -1,33 +1,34 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Sequence
 from fastapi import HTTPException
-from .schemas import UserCreateSchema
+from .schemas import UserCreateSchema, UserUpdateSchema
 from sqlalchemy.orm import joinedload
 from .models import User, UserProfile
 from sqlalchemy import select
 from api.auth.utils import hash_password
 
 
-async def create_casual_user(db:AsyncSession, user: UserCreateSchema) -> User: # demo version will rewrite todo
+async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
     """
         can create: admin
     """
-    async with db.begin():
-        db_user = User(
-            email=user.email,
-            hashed_password=hash_password(user.hashed_password),
-            is_active=True,
-            is_staff=False,
-        )
-        db.add(db_user)
-        await db.flush()
-        db_profile = UserProfile(
-            user_id=db_user.id,
-            first_name=user.profile.first_name,
-            last_name=user.profile.last_name,
-        )
-        db.add(db_profile)
-    await db.refresh(db_user)
+    db_user = User(
+        email=data.email,
+        hashed_password=hash_password(data.hashed_password),
+        is_active=True,
+        is_staff=False,
+    )
+    db.add(db_user)
+    await db.flush()
+
+    db_profile = UserProfile(
+        user_id=db_user.id,
+        first_name=data.profile.first_name,
+        last_name=data.profile.last_name,
+    )
+    db.add(db_profile)
+    await db.commit()
+
     result = await db.execute(
         select(User)
         .options(joinedload(User.profile)
@@ -37,29 +38,32 @@ async def create_casual_user(db:AsyncSession, user: UserCreateSchema) -> User: #
     return result.scalar_one()
 
 
-async def create_editor(db:AsyncSession, user: UserCreateSchema ) -> User: # demo version will rewrite todo
+async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
     """
         can create: admin
     """
-    async with db.begin():
-        db_user = User(
-            email=user.email,
-            hashed_password=hash_password(user.hashed_password),
-            is_active=True,
-            is_staff=True,
-        )
-        db.add(db_user)
-        await db.flush()
-        db_profile = UserProfile(
-            user_id=db_user.id,
-            first_name=user.profile.first_name,
-            last_name=user.profile.last_name,
-        )
-        db.add(db_profile)
-    await db.refresh(db_user)
+
+    db_user = User(
+        email=data.email,
+        hashed_password=hash_password(data.hashed_password),
+        is_active=True,
+        is_staff=False,
+    )
+    db.add(db_user)
+    await db.flush()
+
+    db_profile = UserProfile(
+        user_id=db_user.id,
+        first_name=data.profile.first_name,
+        last_name=data.profile.last_name,
+    )
+    db.add(db_profile)
+    await db.commit()
+
     result = await db.execute(
         select(User)
-        .options(joinedload(User.profile))
+        .options(joinedload(User.profile)
+                 .selectinload(UserProfile.articles))
         .where(User.id == db_user.id)
     )
     return result.scalar_one()
@@ -68,6 +72,7 @@ async def create_editor(db:AsyncSession, user: UserCreateSchema ) -> User: # dem
 async def get_all_users(db:AsyncSession) -> Sequence[User]: # have to set pagination todo
     """
         return all users and a titles of their articles
+        can get: admin only
     """
     result = await db.execute(
         select(User)
@@ -75,9 +80,25 @@ async def get_all_users(db:AsyncSession) -> Sequence[User]: # have to set pagina
             joinedload(User.profile)
             .selectinload(UserProfile.articles)
         )
+        .where(User.is_staff == False)
     )
     return result.unique().scalars().all() # 'unique()' because of 'joinedload()' can duplicate
 
+async def get_all_users_editors(db:AsyncSession) -> Sequence[User]: # have to set pagination todo
+    """
+        return all users and a titles of their articles
+        can get: admin only
+    """
+    result = await db.execute(
+        select(User)
+        .options(
+            joinedload(User.profile)
+            .selectinload(UserProfile.articles)
+        )
+        .where(User.is_staff == True)
+        .where(User.is_superuser == False)
+    )
+    return result.unique().scalars().all()
 
 async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     """
@@ -98,7 +119,7 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     return user
 
 
-async def update_user(data: UserCreateSchema, db: AsyncSession, user_id: int, ) -> User: # todo demo version will rewrite, have problem with password
+async def update_user(data: UserUpdateSchema, db: AsyncSession, user_id: int, ) -> User:
     """
         can update: admin & account's owner
     """
@@ -132,10 +153,13 @@ async def update_user(data: UserCreateSchema, db: AsyncSession, user_id: int, ) 
 async def delete_user(db: AsyncSession,
                       user_id: int):
     """
-        can delete: admin
+        Delete user
+        :param: user_id
+        :return: None
+        :permission: admin
     """
-    stmt = select(User).where(User.id == user_id)
-    user = await db.scalar(stmt)
+    result = select(User).where(User.id == user_id)
+    user = await db.scalar(result)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -159,8 +183,12 @@ async def block_user(db: AsyncSession, user_id: int) -> User: # soft deletion
         .where(User.id == user_id)
     )
     user = result.scalar_one_or_none()
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    if user.is_superuser:
+        raise HTTPException(status_code=403, detail="Cannot block superuser")
 
     if not user.is_active:
         raise HTTPException(status_code=400, detail="User already deactivated")
