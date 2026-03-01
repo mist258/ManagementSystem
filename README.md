@@ -1,8 +1,11 @@
 # Management system
 
 **Python version** - 3.13
+
 **Database** - PostgreSQL 18
+
 **Containerization** - Docker 28
+
 **Framework** - FastAPI
 
 **Development tools:** alembic, SQLAlchemy, uvicorn, pydantic, pydantic-settings, asyncpg,
