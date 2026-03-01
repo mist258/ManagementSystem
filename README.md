@@ -5,7 +5,7 @@
 **Containerization** - Docker 28
 **Framework** - FastAPI
 
-**Development tools: ** alembic, SQLAlchemy, uvicorn, pydantic, pydantic-settings, asyncpg,
+**Development tools:** alembic, SQLAlchemy, uvicorn, pydantic, pydantic-settings, asyncpg,
 pyjwt, bcrypt, isort, python-multipart, pytest, pytest-asyncio, httpx, pytest-cov
 
 
