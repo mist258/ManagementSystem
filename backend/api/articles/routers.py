@@ -19,12 +19,19 @@ from .services import create_article, delete_article, get_all_articles, get_arti
 
 article_router = APIRouter()
 
-@article_router.get("", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
+@article_router.get("", response_model=List[ArticleFullResponseSchema],
+                    summary="Get all articles",
+                    description="Available for anyone",
+                    status_code=status.HTTP_200_OK )
 async def get_articles(pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter)):
     return await get_all_articles(pagination=pagination, db=db)
 
-@article_router.get("/search", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
+
+@article_router.get("/search", response_model=List[ArticleFullResponseSchema],
+                    summary="Search articles",
+                    description="Search articles by title .Available for anyone",
+                    status_code=status.HTTP_200_OK )
 async def get_articles(pagination: PaginationDep,
                        db: AsyncSession = Depends(db_helper.session_getter),
                        search: str | None = Query(None, description="Search for articles"),
@@ -38,7 +45,11 @@ async def get_articles(pagination: PaginationDep,
         sort_by=sort_by,
         sort_order=sort_order)
 
-@article_router.post("", response_model=ArticleCreateSchema, status_code=status.HTTP_201_CREATED)
+
+@article_router.post("", response_model=ArticleCreateSchema,
+                        summary="Create new article",
+                        description="Available for user as author or admin",
+                        status_code=status.HTTP_201_CREATED)
 async def post_new_article(
         article: ArticleCreateSchema,
         db: AsyncSession = Depends(db_helper.session_getter),
@@ -47,7 +58,11 @@ async def post_new_article(
     return await create_article(db, article, user)
 
 
-@article_router.put("/{article_id}", response_model=ArticleUpdateSchema, response_model_exclude_none=True, status_code=status.HTTP_200_OK)
+@article_router.put("/{article_id}", response_model=ArticleUpdateSchema,
+                    response_model_exclude_none=True,
+                    summary="Update article",
+                    description="Available for owner, editor and admin",
+                    status_code=status.HTTP_200_OK)
 async def update_article_by_id(
         article_id: int,
         data : ArticleUpdateSchema,
@@ -57,7 +72,10 @@ async def update_article_by_id(
     return await update_article(db, article_id, data)
 
 
-@article_router.delete("/{article_id}", status_code=status.HTTP_204_NO_CONTENT)
+@article_router.delete("/{article_id}",
+                        summary="Delete article",
+                        description="Delete article by id. Available for owner and admin",
+                        status_code=status.HTTP_204_NO_CONTENT)
 async def delete_article_by_id(
         article_id: int,
         db: AsyncSession = Depends(db_helper.session_getter),
@@ -66,7 +84,10 @@ async def delete_article_by_id(
     return await delete_article(db, article_id)
 
 
-@article_router.get("/{article_id}", response_model=ArticleFullResponseSchema, status_code=status.HTTP_200_OK )
+@article_router.get("/{article_id}", response_model=ArticleFullResponseSchema,
+                    summary="Get a single article",
+                    description="Available for anyone",
+                    status_code=status.HTTP_200_OK )
 async def get_single_article_by_id(article_id: int, db: AsyncSession = Depends(db_helper.session_getter)):
     return await get_article_by_id(db, article_id)
 

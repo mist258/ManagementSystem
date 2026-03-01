@@ -19,7 +19,11 @@ async def lifespan(app: FastAPI):
     await db_helper.dispose()
 
 
-main_app = FastAPI(lifespan=lifespan)
+main_app = FastAPI(lifespan=lifespan,
+                   title="Management System API",
+                   description="REST API for managing users and articles with role-based access control",
+                   version="1.0.0",
+                   )
 from sqlalchemy import text
 
 
