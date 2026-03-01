@@ -17,6 +17,12 @@ def create_jwt_token(token_type: str,
                      expire_timedelta: timedelta | None = None,
                      expire_minutes: int = settings.auth_jwt.access_token_expire_minutes,
 ) -> str:
+    """
+    :param: token_type
+    :param: payload
+    :param: expire_timedelta
+    :param: expire_minutes
+    """
     jwt_payload = {TOKEN_TYPE_FIELD: token_type}
     jwt_payload.update(payload)
     return encode_jwt(
@@ -27,6 +33,10 @@ def create_jwt_token(token_type: str,
 
 
 def create_access_token(user: UserLoginSchema) -> str:
+    """
+        create access token
+        :param: user[schema]
+    """
     jwt_payload = {
         "sub": str(user.id),
         "email": user.email,
@@ -37,6 +47,11 @@ def create_access_token(user: UserLoginSchema) -> str:
 
 
 def create_refresh_token(user: UserLoginSchema) -> str:
+    """
+        create refresh token
+        :param: user[schema]
+    """
+
     jwt_payload = {
         "sub": str(user.id),
         "email": user.email,
@@ -47,6 +62,11 @@ def create_refresh_token(user: UserLoginSchema) -> str:
 
 
 def validate_token_type(payload: dict, token_type: str) -> bool:
+    """
+        validate token type
+        :param:
+        :param:
+    """
     if payload.get(TOKEN_TYPE_FIELD) == token_type:
         return True
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,

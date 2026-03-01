@@ -17,6 +17,8 @@ from .schemas import UserCreateSchema, UserUpdateSchema
 async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
     """
         can create: admin
+        :param: db[AsyncSession]
+        :param: data[schema]
     """
     try:
         db_user = User(
@@ -55,6 +57,8 @@ async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
 async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
     """
         can create: admin
+        :param: db[AsyncSession]
+        :param: data[schema]
     """
 
     try:
@@ -96,6 +100,8 @@ async def get_all_users(db:AsyncSession,
     """
         return all users and a titles of their articles
         can get: admin only
+        :param: db[AsyncSession]
+        :param: pagination
     """
     result = await db.execute(
         select(User)
@@ -114,6 +120,8 @@ async def get_all_users_editors(db:AsyncSession,
     """
         return all users and a titles of their articles
         can get: admin only
+        :param: db[AsyncSession]
+        :param: pagination
     """
     result = await db.execute(
         select(User)
@@ -131,6 +139,8 @@ async def get_all_users_editors(db:AsyncSession,
 async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     """
         can get: admin only
+        :param: db[AsyncSession]
+        :param: user_id[int]
     """
     result = await db.execute(
         select(User)
@@ -150,6 +160,9 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
 async def update_user(data: UserUpdateSchema, db: AsyncSession, user_id: int, ) -> User:
     """
         can update: admin & account's owner
+        :param: db[AsyncSession]
+        :param: user_id[int]
+        :param: data[schema]
     """
     result = await db.execute(
         select(User)
@@ -182,6 +195,9 @@ async def delete_user(db: AsyncSession,
                       user_id: int):
     """
         Delete user
+        can delete: admin only
+        :param: db[AsyncSession]
+        :param: user_id[int]
     """
     result = select(User).where(User.id == user_id)
     user = await db.scalar(result)
@@ -196,6 +212,9 @@ async def delete_user(db: AsyncSession,
 async def block_user(db: AsyncSession, user_id: int) -> User: # soft deletion
     """
         Deactivate user
+        can deactivate: admin only
+        :param: db[AsyncSession]
+        :param: user_id[int]
     """
     result = await db.execute(
         select(User)
@@ -223,9 +242,10 @@ async def block_user(db: AsyncSession, user_id: int) -> User: # soft deletion
 
 async def unblock_user(db: AsyncSession, user_id: int) -> User:
     """
+        Unblock user
+        can unblock: admin only
         :param user_id:
         :return: unblocked user
-        :permission: admin
     """
     result = await db.execute(
         select(User)
@@ -251,6 +271,12 @@ async def search_users_by_name(
     pagination: PaginationDep,
     search: str | None = None,
 ) -> Sequence[User]:
+    """
+    search users by name
+    :param: db[AsyncSession]
+    :param: pagination
+    :param: search[str] or None
+    """
     stmt = (
         select(User)
         .join(User.profile)

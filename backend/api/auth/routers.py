@@ -42,14 +42,3 @@ def user_refresh(
         refresh_token=refresh_token,
     )
 
-
-
-
-
-
-
-
-
-
-
-

@@ -19,6 +19,9 @@ async def create_article(
 ):
     """
         can create: user & superuser
+        :param: db[AsyncSession]
+        :param: article[schema]
+        :param: user
     """
     result = Article(
         title=article.title,
@@ -38,6 +41,9 @@ async def update_article(
 ) -> ArticleCreateSchema:
     """
         can update: owner & editor & superuser
+        :param: db[AsyncSession]
+        :param: article_id[int]
+        :param: data
     """
     result = await db.execute(
         select(Article).where(Article.id == article_id)
@@ -66,6 +72,8 @@ async def update_article(
 async def delete_article(db: AsyncSession, article_id: int) -> None:
     """
         can delete: owner & superuser
+        :param: db[AsyncSession]
+        :param: article_id[int]
     """
     result = await db.execute(
         select(Article).where(Article.id == article_id)
@@ -86,6 +94,8 @@ async def get_all_articles(
         db: AsyncSession) -> Sequence[Article]:
     """
         can get: anyone
+        :param: db[AsyncSession]
+        :param: pagination
     """
     result = await db.execute(
         select(Article)
@@ -99,7 +109,9 @@ async def get_article_by_id(
         db:AsyncSession,
         article_id: int) -> Article:
     """
-    can get: anyone
+        can get: anyone
+        :param: db[AsyncSession]
+        :param: article_id[int]
     """
     result = await db.execute(
         select(Article)
@@ -121,7 +133,12 @@ async def search_articles(
         sort_order: SortOrder = SortOrder.desc,
 ) -> Sequence[Article]:
     """
-    can get: anyone
+        can get: anyone
+        :param: db[AsyncSession]
+        :param: pagination
+        :param: search[str] or None
+        :param: sort_by[ArticleSortField]
+        :param: sort_order[ArticleSortField]
     """
 
     stmt = select(Article)
