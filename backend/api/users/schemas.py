@@ -1,5 +1,5 @@
 from typing import List
-
+import re
 from pydantic import BaseModel, EmailStr, field_validator
 from api.articles.schemas import ArticleTitleSchema
 
@@ -40,7 +40,7 @@ class UserProfileSchema(BaseModel):
 
 class UserCreateSchema(BaseModel):
     email: EmailStr
-    hashed_password: str # will be deleted
+    hashed_password: str # todo validation
     profile: UserProfileSchema
 
     @field_validator('email')
@@ -51,6 +51,16 @@ class UserCreateSchema(BaseModel):
         email = email_name + "@" + domain_part.lower()
         return email
 
+    @field_validator('hashed_password')
+    @classmethod
+    def validate_received_password(cls, password: str) -> str:
+
+        pattern = r"^[A-Za-z\d@$!%*?&]{8,}$"
+
+        if not re.fullmatch(pattern, password):
+            raise ValueError('Password must contain at least 8 characters,'
+                                    '1 special symbol, 1 letter, 1 number')
+        return password
 
 # for blocking & unblocking users
 class UserBlockUnblockSchema(BaseModel):
@@ -65,3 +75,4 @@ class UserProfileBlockSchema(BaseModel):
     is_active: bool
     is_staff: bool
     profile: UserBlockUnblockSchema
+
