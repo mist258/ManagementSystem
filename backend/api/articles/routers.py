@@ -2,8 +2,6 @@ from typing import List
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.util import await_only
-
 from api.articles.schemas import (ArticleCreateSchema,
                                   ArticleUpdateSchema,
                                   ArticleFullResponseSchema)
