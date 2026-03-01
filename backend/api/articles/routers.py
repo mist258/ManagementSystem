@@ -16,6 +16,8 @@ from .services import (create_article,
                        delete_article,
                        get_all_articles,
                        get_article_by_id)
+from utils.pagination import PaginationDep
+
 
 
 article_router = APIRouter()
@@ -49,8 +51,9 @@ async def delete_article_by_id(
 
 
 @article_router.get("", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
-async def get_articles(db: AsyncSession = Depends(db_helper.session_getter)): # TODO set pagination
-    return await get_all_articles(db)
+async def get_articles(pagination: PaginationDep,
+        db: AsyncSession = Depends(db_helper.session_getter)): # TODO set pagination
+    return await get_all_articles(pagination=pagination, db=db)
 
 
 @article_router.get("/{article_id}", response_model=ArticleFullResponseSchema, status_code=status.HTTP_200_OK )

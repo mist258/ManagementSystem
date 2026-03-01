@@ -18,24 +18,27 @@ from .services import (get_all_users,
                        unblock_user,
                        update_user)
 from .dependencies import require_superuser, require_owner_or_superuser
+from utils.pagination import PaginationDep
 
 users_router = APIRouter()
 
 @users_router.get("/authors", response_model=List[UserRetrieveSchema], status_code=status.HTTP_200_OK)
 async def get_users_as_author(
+        pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_superuser)
-): # should set pagination todo
-    users = await get_all_users(db=db)
+):
+    users = await get_all_users(db=db, pagination=pagination)
     return users
 
 
 @users_router.get("/editors", response_model=List[EditorRetrieveSchema], status_code=status.HTTP_200_OK)
 async def get_users_as_editor(
+        pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_superuser)
-): # should set pagination todo
-    users = await get_all_users_editors(db=db)
+):
+    users = await get_all_users_editors(db=db, pagination=pagination)
     return users
 
 @users_router.post("", response_model=UserRetrieveSchema, status_code=status.HTTP_201_CREATED)

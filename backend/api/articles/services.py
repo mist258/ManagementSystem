@@ -6,6 +6,7 @@ from sqlalchemy.orm.exc import StaleDataError
 from api.articles.models import Article
 from api.users.models import User
 from api.articles.schemas import ArticleCreateSchema, ArticleUpdateSchema
+from utils.pagination import PaginationDep
 
 
 async def create_article(
@@ -77,17 +78,23 @@ async def delete_article(db: AsyncSession, article_id: int) -> None:
     await db.commit()
 
 
-async def get_all_articles(db: AsyncSession) -> Sequence[Article]:
+async def get_all_articles(
+        pagination: PaginationDep,
+        db: AsyncSession) -> Sequence[Article]:
     """
         can get: anyone
     """
     result = await db.execute(
         select(Article)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
     )
     return result.scalars().all()
 
 
-async def get_article_by_id(db:AsyncSession, article_id: int) -> Article:
+async def get_article_by_id(
+        db:AsyncSession,
+        article_id: int) -> Article:
     """
          can get: anyone
     """
