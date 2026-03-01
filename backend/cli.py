@@ -1,7 +1,6 @@
 import asyncio
 import click
 from sqlalchemy import select
-
 from api.auth.utils import hash_password
 from core.models.db_helper import db_helper
 from api.users.models import User, UserProfile
@@ -16,7 +15,9 @@ def cli():
 @click.option('--email', prompt='Email')
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
 def create_superuser(first_name, last_name, email: str, password: str):
-    """Create a superuser account."""
+    """
+        Create a superuser account
+        """
     asyncio.run(_create_superuser(first_name, last_name, email, password))
 
 async def _create_superuser(first_name: str, last_name: str, email: str, password: str):
