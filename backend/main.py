@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends
 import uvicorn
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from api import router as api_router
 from core.config import settings
 from contextlib import asynccontextmanager
@@ -17,6 +19,25 @@ async def lifespan(app: FastAPI):
 
 
 main_app = FastAPI(lifespan=lifespan)
+from sqlalchemy import text
+
+# liveness endpoint
+@main_app.get("/health", tags=["health"])
+async def health_check(db: AsyncSession = Depends(db_helper.session_getter)):
+    try:
+        await db.execute(text("SELECT 1"))
+        return {
+            "status": "ok",
+            "database": "ok"
+        }
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "error",
+                "database": "unavailable"
+            }
+        )
 
 main_app.include_router(
     api_router,
