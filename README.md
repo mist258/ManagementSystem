@@ -28,21 +28,17 @@ pyjwt, bcrypt, isort, python-multipart, pytest, pytest-asyncio, httpx, pytest-co
 
     4) docker compose build optional[--no-cache]
 
-    5) docker compose up optional[-d]
+    5) cd backend/ (#move to working dir)
 
-    Optional, if the database wasn’t created, run the following command:
+    6) mkdir certs (#create dir for public & private keys)
 
-       docker exec -it [container_name] psql -U postgres[user_name] -c "CREATE DATABASE [db_name]";
+    7) cd certs/ (# move to dir 'certs/' to generate keys)
 
-    6) cd backend/ (#move to working dir)
+    8) openssl genrsa -out jwt-private.pem 2048 (#primary you should generate private key)
 
-    7) mkdir certs (#create dir for public & private keys)
+    9) openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem (#the next step is generate public key)
 
-    8) cd certs/ (# move to dir 'certs/' to generate keys)
-
-    9) openssl genrsa -out jwt-private.pem 2048 (#primary you should generate private key)
-
-    10) openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem (#the next step is generate public key)
+    10) docker compose up optional[-d]
 
     11) docker compose exec app alembic upgrade head (#to execute this command you should move to root project dir ManagementSystem/)
 
