@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 import uvicorn
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from api import router as api_router
 from core.config import settings
 from contextlib import asynccontextmanager
@@ -42,9 +41,3 @@ async def health_check(db: AsyncSession = Depends(db_helper.session_getter)):
 main_app.include_router(
     api_router,
     prefix=settings.api.prefix)
-
-if __name__ == "__main__":
-    uvicorn.run("main:main_app",
-                host=settings.run.host,
-                port=settings.run.port,
-                reload=True,)
