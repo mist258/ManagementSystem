@@ -38,7 +38,7 @@ pyjwt, bcrypt, isort, python-multipart, pytest, pytest-asyncio, httpx, pytest-co
 
     9) openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem (#the next step is generate public key)
 
-    10) docker compose up optional[-d]
+    10) docker compose up optional[-d] (#to execute this command you should move to root project dir ManagementSystem/)
 
     11) docker compose exec app alembic upgrade head (#to execute this command you should move to root project dir ManagementSystem/)
 
