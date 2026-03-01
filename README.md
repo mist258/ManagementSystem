@@ -115,6 +115,6 @@ JWT-based authentication with RS256 asymmetric encryption.
 | POST   | `/api/v1/auth/refresh` | Authenticated | Get new access token |
 
 
-**Spicial links**
+**Special links**
 - Health check: http://localhost:8002/health
 - Documentation: http://localhost:8002/docs
