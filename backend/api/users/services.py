@@ -8,6 +8,9 @@ from .models import User, UserProfile
 from sqlalchemy import select
 from api.auth.utils import hash_password
 from utils.pagination import PaginationDep
+from sqlalchemy import or_
+
+
 
 async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
     """
@@ -246,3 +249,30 @@ async def unblock_user(db: AsyncSession, user_id: int) -> User:
     await db.commit()
     await db.refresh(user)
     return user
+
+async def search_users_by_name(
+    db: AsyncSession,
+    pagination: PaginationDep,
+    search: str | None = None,
+) -> Sequence[User]:
+    stmt = (
+        select(User)
+        .join(User.profile)
+        .options(
+            joinedload(User.profile)
+            .selectinload(UserProfile.articles)
+        )
+        .where(User.is_staff == False)
+    )
+
+    if search:
+        stmt = stmt.where(
+            or_(
+                UserProfile.first_name.ilike(f"%{search}%"),
+                UserProfile.last_name.ilike(f"%{search}%")
+            )
+        )
+
+    stmt = stmt.limit(pagination.limit).offset(pagination.offset)
+    result = await db.execute(stmt)
+    return result.unique().scalars().all()

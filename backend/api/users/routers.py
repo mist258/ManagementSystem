@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper
 from .schemas import (UserRetrieveSchema,
@@ -6,7 +6,7 @@ from .schemas import (UserRetrieveSchema,
                       EditorRetrieveSchema,
                       UserProfileBlockSchema,
                       UserUpdateSchema)
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from .models import User
 from .services import (get_all_users,
                        get_all_users_editors,
@@ -16,11 +16,20 @@ from .services import (get_all_users,
                        get_user_by_id,
                        block_user,
                        unblock_user,
-                       update_user)
+                       update_user,
+                       search_users_by_name)
 from .dependencies import require_superuser, require_owner_or_superuser
 from utils.pagination import PaginationDep
 
 users_router = APIRouter()
+
+@users_router.get("/search", response_model=List[UserRetrieveSchema])
+async def search_users(
+    pagination: PaginationDep,
+    db: AsyncSession = Depends(db_helper.session_getter),
+    search: str | None = Query(None, description="Search users by name"),
+) -> Sequence[User]:
+    return await search_users_by_name(db=db, pagination=pagination, search=search)
 
 @users_router.get("/authors", response_model=List[UserRetrieveSchema], status_code=status.HTTP_200_OK)
 async def get_users_as_author(
@@ -90,6 +99,8 @@ async def activate_user(user_id: int,
     user = await unblock_user(db=db, user_id=user_id)
     return user
 
+
+
 @users_router.put("/{user_id}", response_model=UserUpdateSchema, status_code=status.HTTP_200_OK)
 async def update_user_by_id(user_id: int,
                             data: UserUpdateSchema,
@@ -98,3 +109,4 @@ async def update_user_by_id(user_id: int,
                             ) -> User:
     user = await update_user(data, db=db, user_id=user_id)
     return user
+
