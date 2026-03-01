@@ -79,17 +79,10 @@ class UserUpdateSchema(BaseModel):
         email = email_name + "@" + domain_part.lower()
         return email
 
-# for blocking & unblocking users
-class UserBlockUnblockSchema(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-
-
+# for blocked user
 class UserProfileBlockSchema(BaseModel):
     id: int
     email: EmailStr
     is_active: bool
     is_staff: bool
-    profile: UserBlockUnblockSchema
 
