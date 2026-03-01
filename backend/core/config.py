@@ -1,6 +1,8 @@
-from pydantic import BaseModel, PostgresDsn
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from pydantic import BaseModel, PostgresDsn
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -21,6 +23,9 @@ class AuthJWT(BaseModel):
     access_token_expire_minutes: int = 15
     refresh_token_expire_minutes: int = 60 * 24 * 2
 
+# for tests
+class DatabaseTestConfig(BaseSettings):
+    url: PostgresDsn
 
 class DatabaseConfig(BaseSettings):
     url: PostgresDsn
@@ -50,5 +55,6 @@ class Settings(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
     auth_jwt: AuthJWT = AuthJWT()
+    db_test: DatabaseTestConfig | None = None
 
 settings = Settings()
