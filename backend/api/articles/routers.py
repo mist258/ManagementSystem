@@ -52,7 +52,7 @@ async def delete_article_by_id(
 
 @article_router.get("", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
 async def get_articles(pagination: PaginationDep,
-        db: AsyncSession = Depends(db_helper.session_getter)): # TODO set pagination
+        db: AsyncSession = Depends(db_helper.session_getter)):
     return await get_all_articles(pagination=pagination, db=db)
 
 

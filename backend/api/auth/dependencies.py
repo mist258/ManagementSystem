@@ -80,7 +80,6 @@ async def get_user_by_token_sub(
     return user
 
 # access token
-# todo can be something wrong with articles
 async def get_current_auth_user(
         payload: dict = Depends(get_current_token_payload),
         db: AsyncSession = Depends(db_helper.session_getter)

@@ -87,7 +87,7 @@ async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
 
 
 async def get_all_users(db:AsyncSession,
-                        pagination: PaginationDep) -> Sequence[User]: # have to set pagination todo
+                        pagination: PaginationDep) -> Sequence[User]:
     """
         return all users and a titles of their articles
         can get: admin only
@@ -105,7 +105,7 @@ async def get_all_users(db:AsyncSession,
     return result.unique().scalars().all() # 'unique()' because of 'joinedload()' can duplicate
 
 async def get_all_users_editors(db:AsyncSession,
-                                pagination: PaginationDep) -> Sequence[User]: # have to set pagination todo
+                                pagination: PaginationDep) -> Sequence[User]:
     """
         return all users and a titles of their articles
         can get: admin only
