@@ -23,6 +23,25 @@ from utils.pagination import PaginationDep
 
 article_router = APIRouter()
 
+@article_router.get("", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
+async def get_articles(pagination: PaginationDep,
+        db: AsyncSession = Depends(db_helper.session_getter)):
+    return await get_all_articles(pagination=pagination, db=db)
+
+@article_router.get("/search", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
+async def get_articles(pagination: PaginationDep,
+                       db: AsyncSession = Depends(db_helper.session_getter),
+                       search: str | None = Query(None, description="Search for articles"),
+                       sort_by: ArticleSortField = Query(ArticleSortField.created_at),
+                       sort_order: SortOrder = Query(SortOrder.desc),
+) -> Sequence[ArticleFullResponseSchema]:
+    return await search_articles(
+        db=db,
+        pagination=pagination,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order)
+
 @article_router.post("", response_model=ArticleCreateSchema, status_code=status.HTTP_201_CREATED)
 async def post_new_article(
         article: ArticleCreateSchema,
@@ -49,26 +68,6 @@ async def delete_article_by_id(
         user: User = Depends(require_article_owner_or_admin)
 ):
     return await delete_article(db, article_id)
-
-
-@article_router.get("", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
-async def get_articles(pagination: PaginationDep,
-        db: AsyncSession = Depends(db_helper.session_getter)):
-    return await get_all_articles(pagination=pagination, db=db)
-
-@article_router.get("/search", response_model=List[ArticleFullResponseSchema], status_code=status.HTTP_200_OK )
-async def get_articles(pagination: PaginationDep,
-                       db: AsyncSession = Depends(db_helper.session_getter),
-                       search: str | None = Query(None, description="Search for articles"),
-                       sort_by: ArticleSortField = Query(ArticleSortField.created_at),
-                       sort_order: SortOrder = Query(SortOrder.desc),
-) -> Sequence[ArticleFullResponseSchema]:
-    return await search_articles(
-        db=db,
-        pagination=pagination,
-        search=search,
-        sort_by=sort_by,
-        sort_order=sort_order)
 
 
 @article_router.get("/{article_id}", response_model=ArticleFullResponseSchema, status_code=status.HTTP_200_OK )
