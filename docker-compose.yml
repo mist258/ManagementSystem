@@ -20,7 +20,10 @@ services:
     ports:
       - "80:80"
     volumes:
+      - ./client:/usr/share/nginx/error_html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
     restart: on-failure
 
   db:
