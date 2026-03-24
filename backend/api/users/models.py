@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from core.mixins import IdPkMixin, TimestampMixin
 from core.models import Base
 
-from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from api.articles.models import Article
 
+
+class UserRole(Enum):
+    VIEWER = "viewer"
 
 class User(IdPkMixin, Base):
     """
@@ -23,6 +26,7 @@ class User(IdPkMixin, Base):
         unique=True,
         nullable=False
     )
+    role: Mapped[Optional[str]] = mapped_column(String(10), default=UserRole.VIEWER, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True) # "True" for all roles in system (if is_active=False -> soft deletion )
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False) # "True" only for superuser
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False) # "True" for editor and superuser

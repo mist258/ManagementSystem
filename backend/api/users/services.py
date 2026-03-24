@@ -66,7 +66,7 @@ async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
             email=data.email,
             hashed_password=hash_password(data.hashed_password),
             is_active=True,
-            is_staff=False,
+            is_staff=True,
         )
         db.add(db_user)
         await db.flush()

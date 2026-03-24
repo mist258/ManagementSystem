@@ -1,8 +1,13 @@
-from api.users.schemas import UserRetrieveSchema
+from api.users.schemas import UserCreateSchema, UserRetrieveSchema
+from core.models import db_helper
 from starlette import status
 
 from fastapi import APIRouter, Depends
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..users.models import User
+from ..users.services import create_casual_user
 from .dependencies import (
     get_current_active_user,
     get_current_auth_user_for_refresh,
@@ -12,6 +17,16 @@ from .schemas import TokenInfoSchema, UserLoginSchema
 from .services import create_access_token, create_refresh_token
 
 auth_router = APIRouter()
+
+@auth_router.post("/sign_up",
+                  response_model=UserRetrieveSchema,
+                  summary="Sign up in system",
+                  description="User can sign up in system. Available for anyone",
+                  status_code=status.HTTP_201_CREATED)
+async def sign_up(data: UserCreateSchema,
+            db: AsyncSession = Depends(db_helper.session_getter))  -> User:
+    return await create_casual_user(db=db, data=data)
+
 
 @auth_router.post("/login", response_model=TokenInfoSchema,
                     summary="Login",

@@ -17,6 +17,7 @@ class UserProfileRetrieveSchema(BaseModel):
 class UserRetrieveSchema(BaseModel):
     id: int
     email: EmailStr
+    role: str
     is_active: bool
     is_staff: bool
     is_superuser: bool
@@ -83,6 +84,7 @@ class UserUpdateSchema(BaseModel):
 class UserProfileBlockSchema(BaseModel):
     id: int
     email: EmailStr
+    role: str
     is_active: bool
     is_staff: bool
 
