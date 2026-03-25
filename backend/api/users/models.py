@@ -1,18 +1,19 @@
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import TYPE_CHECKING, Optional
 
 from core.mixins import IdPkMixin, TimestampMixin
 from core.models import Base
 
-from sqlalchemy import Boolean, Enum, ForeignKey, Integer, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from api.articles.models import Article
 
 
-class UserRole(Enum):
+class UserRole(StrEnum):
     VIEWER = "viewer"
 
 class User(IdPkMixin, Base):
