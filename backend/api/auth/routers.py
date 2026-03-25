@@ -9,9 +9,8 @@ from api.users.models import User
 from api.users.schemas import UserCreateSchema, UserRetrieveSchema
 from api.users.services import create_casual_user
 from core.models import db_helper
-from starlette import status
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,7 +32,7 @@ async def sign_up(data: UserCreateSchema,
                     status_code=status.HTTP_200_OK)
 def user_login(
         user: UserLoginSchema = Depends(validate_auth_user),
-):
+) -> TokenInfoSchema:
     access_token = create_access_token(user)
     refresh_token = create_refresh_token(user)
 
@@ -46,7 +45,8 @@ def user_login(
                     summary="Get information about me",
                     description="Available for authorized users",
                     status_code=status.HTTP_200_OK)
-def current_user(user: UserRetrieveSchema = Depends(get_current_active_user)):
+def current_user(user: UserRetrieveSchema = Depends(get_current_active_user)
+                 ) -> UserRetrieveSchema:
     return user
 
 
@@ -56,7 +56,7 @@ def current_user(user: UserRetrieveSchema = Depends(get_current_active_user)):
                     status_code=status.HTTP_200_OK)
 def user_refresh(
         user: UserLoginSchema = Depends(get_current_auth_user_for_refresh)
-):
+) -> TokenInfoSchema:
     access_token = create_access_token(user)
     refresh_token = create_refresh_token(user)
 

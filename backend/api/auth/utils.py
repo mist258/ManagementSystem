@@ -13,7 +13,7 @@ def encode_jwt(
         algorithm: str = settings.auth_jwt.algorithm,
         expire_timedelta: timedelta | None = None,
         expire_minutes: int = settings.auth_jwt.access_token_expire_minutes
-):
+) -> str:
     """
         Create JWT token
     """
@@ -41,7 +41,7 @@ def decode_jwt(
         token: str | bytes,
         public_key: str = settings.auth_jwt.public_key_path.read_text(),
         algorithm: str = settings.auth_jwt.algorithm
-):
+) -> str:
     """
         Decode JWT token
     """

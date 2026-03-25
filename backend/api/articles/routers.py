@@ -1,6 +1,7 @@
-from typing import List, Sequence
+from collections.abc import Sequence
 
 from api.articles.enums import ArticleSortField, SortOrder
+from api.articles.models import Article
 from api.articles.schemas import ArticleCreateSchema, ArticleFullResponseSchema, ArticleUpdateSchema
 from api.articles.services import (
     create_article,
@@ -25,16 +26,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 article_router = APIRouter()
 
-@article_router.get("", response_model=List[ArticleFullResponseSchema],
+@article_router.get("", response_model=list[ArticleFullResponseSchema],
                     summary="Get all articles",
                     description="Available for anyone",
                     status_code=status.HTTP_200_OK )
 async def get_articles(pagination: PaginationDep,
-        db: AsyncSession = Depends(db_helper.session_getter)):
+        db: AsyncSession = Depends(db_helper.session_getter)
+                       ) -> Sequence[ArticleFullResponseSchema]:
     return await get_all_articles(pagination=pagination, db=db)
 
 
-@article_router.get("/search", response_model=List[ArticleFullResponseSchema],
+@article_router.get("/search", response_model=list[ArticleFullResponseSchema],
                     summary="Search articles",
                     description="Search articles by title .Available for anyone",
                     status_code=status.HTTP_200_OK )
@@ -74,7 +76,7 @@ async def update_article_by_id(
         data : ArticleUpdateSchema,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_article_owner_or_staff)
-):
+) -> Article:
     return await update_article(db, article_id, data)
 
 
@@ -86,7 +88,7 @@ async def delete_article_by_id(
         article_id: int,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_article_owner_or_admin)
-):
+) -> None:
     return await delete_article(db, article_id)
 
 
@@ -94,6 +96,8 @@ async def delete_article_by_id(
                     summary="Get a single article",
                     description="Available for anyone",
                     status_code=status.HTTP_200_OK )
-async def get_single_article_by_id(article_id: int, db: AsyncSession = Depends(db_helper.session_getter)):
+async def get_single_article_by_id(article_id: int,
+                                   db: AsyncSession = Depends(db_helper.session_getter)
+                                   ) -> Article:
     return await get_article_by_id(db, article_id)
 

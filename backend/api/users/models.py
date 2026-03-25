@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from core.mixins import IdPkMixin, TimestampMixin
 from core.models import Base
@@ -27,7 +27,7 @@ class User(IdPkMixin, Base):
         unique=True,
         nullable=False
     )
-    role: Mapped[Optional[str]] = mapped_column(String(10), default=UserRole.VIEWER, nullable=True)
+    role: Mapped[str | None] = mapped_column(String(10), default=UserRole.VIEWER, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True) # "True" for all roles in system (if is_active=False -> soft deletion )
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False) # "True" only for superuser
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False) # "True" for editor and superuser

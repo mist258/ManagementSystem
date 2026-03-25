@@ -191,7 +191,7 @@ async def update_user(data: UserUpdateSchema, db: AsyncSession, user_id: int, ) 
 
 
 async def delete_user(db: AsyncSession,
-                      user_id: int):
+                      user_id: int) -> None:
     """
         Delete user
         can delete: admin only

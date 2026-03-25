@@ -15,7 +15,7 @@ async def create_article(
         db:AsyncSession,
         article: ArticleCreateSchema,
         user:User
-):
+) -> Article:
     """
         can create: user & superuser
         :param: db[AsyncSession]
@@ -37,7 +37,7 @@ async def update_article(
         db:AsyncSession,
         article_id: int,
         data: ArticleUpdateSchema,
-) -> ArticleCreateSchema:
+) -> Article:
     """
         can update: owner & editor & superuser
         :param: db[AsyncSession]
