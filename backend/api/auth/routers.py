@@ -1,4 +1,11 @@
+from api.auth.dependencies import (
+    get_current_active_user,
+    get_current_auth_user_for_refresh,
+    validate_auth_user,
+)
+from api.users.models import User
 from api.users.schemas import UserCreateSchema, UserRetrieveSchema
+from api.users.services import create_casual_user
 from core.models import db_helper
 from starlette import status
 
@@ -6,13 +13,6 @@ from fastapi import APIRouter, Depends
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..users.models import User
-from ..users.services import create_casual_user
-from .dependencies import (
-    get_current_active_user,
-    get_current_auth_user_for_refresh,
-    validate_auth_user,
-)
 from .schemas import TokenInfoSchema, UserLoginSchema
 from .services import create_access_token, create_refresh_token
 

@@ -1,6 +1,8 @@
 from typing import Sequence
 
 from api.auth.utils import hash_password
+from api.users.models import User, UserProfile
+from api.users.schemas import UserCreateSchema, UserUpdateSchema
 from utils.pagination import PaginationDep
 
 from fastapi import HTTPException
@@ -9,9 +11,6 @@ from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
-from .models import User, UserProfile
-from .schemas import UserCreateSchema, UserUpdateSchema
 
 
 async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:

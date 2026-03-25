@@ -1,16 +1,15 @@
 from typing import List, Sequence
 
-from core.models import db_helper
-from utils.pagination import PaginationDep
-
-from fastapi import APIRouter, Depends, Query, status
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from .dependencies import require_owner_or_superuser, require_superuser
-from .models import User
-from .schemas import EditorRetrieveSchema, UserCreateSchema, UserProfileBlockSchema, UserRetrieveSchema, UserUpdateSchema
-from .services import (
+from api.users.dependencies import require_owner_or_superuser, require_superuser
+from api.users.models import User
+from api.users.schemas import (
+    EditorRetrieveSchema,
+    UserCreateSchema,
+    UserProfileBlockSchema,
+    UserRetrieveSchema,
+    UserUpdateSchema,
+)
+from api.users.services import (
     block_user,
     create_casual_user,
     create_editor,
@@ -22,6 +21,12 @@ from .services import (
     unblock_user,
     update_user,
 )
+from core.models import db_helper
+from utils.pagination import PaginationDep
+
+from fastapi import APIRouter, Depends, Query, status
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 users_router = APIRouter()
 

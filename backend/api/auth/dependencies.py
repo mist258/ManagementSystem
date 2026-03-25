@@ -1,3 +1,5 @@
+from api.auth.services import ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE, validate_token_type
+from api.auth.utils import decode_jwt, validate_password
 from api.users.models import User, UserProfile
 from api.users.schemas import UserRetrieveSchema
 from core.models import db_helper
@@ -9,9 +11,6 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
-from .services import ACCESS_TOKEN_TYPE, REFRESH_TOKEN_TYPE, validate_token_type
-from .utils import decode_jwt, validate_password
 
 http_bearer = HTTPBearer()
 
