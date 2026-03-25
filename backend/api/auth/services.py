@@ -1,11 +1,10 @@
 from datetime import timedelta
 
+from api.auth.schemas import UserLoginSchema
+from api.auth.utils import encode_jwt
 from core.config import settings
 
 from fastapi import HTTPException, status
-
-from .schemas import UserLoginSchema
-from .utils import encode_jwt
 
 TOKEN_TYPE_FIELD = "type"
 ACCESS_TOKEN_TYPE = "access"

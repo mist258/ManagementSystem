@@ -1,16 +1,15 @@
-from typing import List, Sequence
+from collections.abc import Sequence
 
-from core.models import db_helper
-from utils.pagination import PaginationDep
-
-from fastapi import APIRouter, Depends, Query, status
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from .dependencies import require_owner_or_superuser, require_superuser
-from .models import User
-from .schemas import EditorRetrieveSchema, UserCreateSchema, UserProfileBlockSchema, UserRetrieveSchema, UserUpdateSchema
-from .services import (
+from api.users.dependencies import require_owner_or_superuser, require_superuser
+from api.users.models import User
+from api.users.schemas import (
+    EditorRetrieveSchema,
+    UserCreateSchema,
+    UserProfileBlockSchema,
+    UserRetrieveSchema,
+    UserUpdateSchema,
+)
+from api.users.services import (
     block_user,
     create_casual_user,
     create_editor,
@@ -22,10 +21,16 @@ from .services import (
     unblock_user,
     update_user,
 )
+from core.models import db_helper
+from utils.pagination import PaginationDep
+
+from fastapi import APIRouter, Depends, Query, status
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 users_router = APIRouter()
 
-@users_router.get("/search", response_model=List[UserRetrieveSchema],
+@users_router.get("/search", response_model=list[UserRetrieveSchema],
                   summary="Search user",
                   description="Search user by first or last name. Available for anyone."
                   )
@@ -37,7 +42,7 @@ async def search_users(
     return await search_users_by_name(db=db, pagination=pagination, search=search)
 
 
-@users_router.get("/authors", response_model=List[UserRetrieveSchema],
+@users_router.get("/authors", response_model=list[UserRetrieveSchema],
                   summary="Get all authors",
                   description="Get all authors. Available for admin.",
                   status_code=status.HTTP_200_OK)
@@ -45,12 +50,12 @@ async def get_users_as_author(
         pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_superuser)
-):
+) -> Sequence[User]:
     users = await get_all_users(db=db, pagination=pagination)
     return users
 
 
-@users_router.get("/editors", response_model=List[EditorRetrieveSchema],
+@users_router.get("/editors", response_model=list[EditorRetrieveSchema],
                     summary="Get all editors",
                     description="Get all editors. Available for admin.",
                     status_code=status.HTTP_200_OK)
@@ -58,7 +63,7 @@ async def get_users_as_editor(
         pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_superuser)
-):
+) -> Sequence[User]:
     users = await get_all_users_editors(db=db, pagination=pagination)
     return users
 

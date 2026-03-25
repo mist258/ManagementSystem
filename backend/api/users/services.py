@@ -1,6 +1,8 @@
 from typing import Sequence
 
 from api.auth.utils import hash_password
+from api.users.models import User, UserProfile
+from api.users.schemas import UserCreateSchema, UserUpdateSchema
 from utils.pagination import PaginationDep
 
 from fastapi import HTTPException
@@ -9,9 +11,6 @@ from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
-from .models import User, UserProfile
-from .schemas import UserCreateSchema, UserUpdateSchema
 
 
 async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
@@ -66,7 +65,7 @@ async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
             email=data.email,
             hashed_password=hash_password(data.hashed_password),
             is_active=True,
-            is_staff=False,
+            is_staff=True,
         )
         db.add(db_user)
         await db.flush()
@@ -192,7 +191,7 @@ async def update_user(data: UserUpdateSchema, db: AsyncSession, user_id: int, ) 
 
 
 async def delete_user(db: AsyncSession,
-                      user_id: int):
+                      user_id: int) -> None:
     """
         Delete user
         can delete: admin only

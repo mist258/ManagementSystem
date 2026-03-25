@@ -1,3 +1,4 @@
+from api.articles.enums import ArticleSortField, SortOrder
 from api.articles.models import Article
 from api.articles.schemas import ArticleCreateSchema, ArticleUpdateSchema
 from api.users.models import User
@@ -9,14 +10,12 @@ from sqlalchemy import Sequence, asc, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
 
-from .enums import ArticleSortField, SortOrder
-
 
 async def create_article(
         db:AsyncSession,
         article: ArticleCreateSchema,
         user:User
-):
+) -> Article:
     """
         can create: user & superuser
         :param: db[AsyncSession]
@@ -38,7 +37,7 @@ async def update_article(
         db:AsyncSession,
         article_id: int,
         data: ArticleUpdateSchema,
-) -> ArticleCreateSchema:
+) -> Article:
     """
         can update: owner & editor & superuser
         :param: db[AsyncSession]

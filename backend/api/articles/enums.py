@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class SortOrder(str, Enum):
+class SortOrder(StrEnum):
     asc = "asc"
     desc = "desc"
 
-class ArticleSortField(str, Enum):
+class ArticleSortField(StrEnum):
     created_at = "created_at"
     title = "title"
