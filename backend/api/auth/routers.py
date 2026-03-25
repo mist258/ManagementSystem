@@ -3,6 +3,8 @@ from api.auth.dependencies import (
     get_current_auth_user_for_refresh,
     validate_auth_user,
 )
+from api.auth.schemas import TokenInfoSchema, UserLoginSchema
+from api.auth.services import create_access_token, create_refresh_token
 from api.users.models import User
 from api.users.schemas import UserCreateSchema, UserRetrieveSchema
 from api.users.services import create_casual_user
@@ -12,9 +14,6 @@ from starlette import status
 from fastapi import APIRouter, Depends
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from .schemas import TokenInfoSchema, UserLoginSchema
-from .services import create_access_token, create_refresh_token
 
 auth_router = APIRouter()
 
