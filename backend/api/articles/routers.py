@@ -32,7 +32,7 @@ article_router = APIRouter()
                     status_code=status.HTTP_200_OK )
 async def get_articles(pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter)
-                       ) -> Sequence[ArticleFullResponseSchema]:
+                       ) -> list[Article]:
     return await get_all_articles(pagination=pagination, db=db)
 
 
@@ -45,7 +45,7 @@ async def get_searched_articles(pagination: PaginationDep,
                        search: str | None = Query(None, description="Search for articles"),
                        sort_by: ArticleSortField = Query(ArticleSortField.created_at),
                        sort_order: SortOrder = Query(SortOrder.desc),
-) -> Sequence[ArticleFullResponseSchema]:
+) -> list[Article]:
     return await search_articles(
         db=db,
         pagination=pagination,

@@ -38,7 +38,7 @@ async def search_users(
     pagination: PaginationDep,
     db: AsyncSession = Depends(db_helper.session_getter),
     search: str | None = Query(None, description="Search users by name"),
-) -> Sequence[User]:
+) -> list[User]:
     return await search_users_by_name(db=db, pagination=pagination, search=search)
 
 
@@ -50,7 +50,7 @@ async def get_users_as_author(
         pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_superuser)
-) -> Sequence[User]:
+) -> list[User]:
     users = await get_all_users(db=db, pagination=pagination)
     return users
 
@@ -63,7 +63,7 @@ async def get_users_as_editor(
         pagination: PaginationDep,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_superuser)
-) -> Sequence[User]:
+) -> list[User]:
     users = await get_all_users_editors(db=db, pagination=pagination)
     return users
 

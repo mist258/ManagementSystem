@@ -95,7 +95,7 @@ async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
 
 
 async def get_all_users(db:AsyncSession,
-                        pagination: PaginationDep) -> Sequence[User]:
+                        pagination: PaginationDep) -> list[User]:
     """
         return all users and a titles of their articles
         can get: admin only
@@ -112,10 +112,10 @@ async def get_all_users(db:AsyncSession,
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
-    return result.unique().scalars().all() # 'unique()' because of 'joinedload()' can duplicate
+    return list(result.unique().scalars().all()) # 'unique()' because of 'joinedload()' can duplicate
 
 async def get_all_users_editors(db:AsyncSession,
-                                pagination: PaginationDep) -> Sequence[User]:
+                                pagination: PaginationDep) -> list[User]:
     """
         return all users and a titles of their articles
         can get: admin only
@@ -133,7 +133,7 @@ async def get_all_users_editors(db:AsyncSession,
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
-    return result.unique().scalars().all()
+    return list(result.unique().scalars().all())
 
 async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     """
@@ -269,7 +269,7 @@ async def search_users_by_name(
     db: AsyncSession,
     pagination: PaginationDep,
     search: str | None = None,
-) -> Sequence[User]:
+) -> list[User]:
     """
     search users by name
     :param: db[AsyncSession]
@@ -294,4 +294,4 @@ async def search_users_by_name(
         )
     stmt = stmt.limit(pagination.limit).offset(pagination.offset)
     result = await db.execute(stmt)
-    return result.unique().scalars().all()
+    return list(result.unique().scalars().all())

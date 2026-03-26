@@ -90,7 +90,7 @@ async def delete_article(db: AsyncSession, article_id: int) -> None:
 
 async def get_all_articles(
         pagination: PaginationDep,
-        db: AsyncSession) -> Sequence[Article]:
+        db: AsyncSession) -> list[Article]:
     """
         can get: anyone
         :param: db[AsyncSession]
@@ -101,7 +101,7 @@ async def get_all_articles(
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
-    return result.scalars().all()
+    return list(result.scalars().all())
 
 
 async def get_article_by_id(
@@ -130,7 +130,7 @@ async def search_articles(
         search: str | None = None,
         sort_by: ArticleSortField = ArticleSortField.created_at,
         sort_order: SortOrder = SortOrder.desc,
-) -> Sequence[Article]:
+) -> list[Article]:
     """
         can get: anyone
         :param: db[AsyncSession]
@@ -155,6 +155,6 @@ async def search_articles(
     stmt = stmt.limit(pagination.limit).offset(pagination.offset)
 
     result = await db.execute(stmt)
-    return result.scalars().all()
+    return list(result.scalars().all())
 
 
