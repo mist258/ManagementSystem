@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from api.users.dependencies import require_owner_or_superuser, require_superuser
 from api.users.models import User
 from api.users.schemas import (

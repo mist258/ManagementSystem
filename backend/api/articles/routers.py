@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from api.articles.enums import ArticleSortField, SortOrder
 from api.articles.models import Article
 from api.articles.schemas import ArticleCreateSchema, ArticleFullResponseSchema, ArticleUpdateSchema

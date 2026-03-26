@@ -6,7 +6,7 @@ from utils.pagination import PaginationDep
 
 from fastapi import HTTPException, status
 
-from sqlalchemy import Sequence, asc, desc, select
+from sqlalchemy import asc, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
 

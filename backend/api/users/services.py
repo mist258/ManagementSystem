@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from api.auth.utils import hash_password
 from api.users.models import User, UserProfile
 from api.users.schemas import UserCreateSchema, UserUpdateSchema
