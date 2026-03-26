@@ -26,7 +26,7 @@ def create_superuser(first_name, last_name, email: str, password: str):
 async def _create_superuser(first_name: str, last_name: str, email: str, password: str):
     async with db_helper.session_factory() as db:
         result = await db.execute(
-            select(User).where(User.is_superuser == True)
+            select(User).where(User.is_superuser)
         )
         if result.scalar_one_or_none():
             click.secho('Admin already exists!', fg='red')

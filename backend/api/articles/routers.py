@@ -40,7 +40,7 @@ async def get_articles(pagination: PaginationDep,
                     summary="Search articles",
                     description="Search articles by title .Available for anyone",
                     status_code=status.HTTP_200_OK )
-async def get_articles(pagination: PaginationDep,
+async def get_searched_articles(pagination: PaginationDep,
                        db: AsyncSession = Depends(db_helper.session_getter),
                        search: str | None = Query(None, description="Search for articles"),
                        sort_by: ArticleSortField = Query(ArticleSortField.created_at),
@@ -62,7 +62,7 @@ async def post_new_article(
         article: ArticleCreateSchema,
         db: AsyncSession = Depends(db_helper.session_getter),
         user: User = Depends(require_user_and_superuser)
-) -> ArticleCreateSchema:
+) -> Article:
     return await create_article(db, article, user)
 
 

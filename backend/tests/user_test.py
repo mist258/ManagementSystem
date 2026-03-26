@@ -59,7 +59,7 @@ async def test_block_user(client: AsyncClient, admin_token: str, create_test_use
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == 200
-    assert response.json()["is_active"] == False
+    assert not response.json()["is_active"]
 
 
 async def test_get_users_unauthorized(client: AsyncClient):

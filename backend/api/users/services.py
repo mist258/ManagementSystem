@@ -108,7 +108,7 @@ async def get_all_users(db:AsyncSession,
             joinedload(User.profile)
             .selectinload(UserProfile.articles)
         )
-        .where(User.is_staff == False)
+        .where(User.is_staff.is_(False))
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
@@ -128,8 +128,8 @@ async def get_all_users_editors(db:AsyncSession,
             joinedload(User.profile)
             .selectinload(UserProfile.articles)
         )
-        .where(User.is_staff == True)
-        .where(User.is_superuser == False)
+        .where(User.is_staff)
+        .where(User.is_superuser.is_(False))
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
@@ -283,7 +283,7 @@ async def search_users_by_name(
             joinedload(User.profile)
             .selectinload(UserProfile.articles)
         )
-        .where(User.is_staff == False)
+        .where(User.is_staff.is_(False))
     )
     if search:
         stmt = stmt.where(

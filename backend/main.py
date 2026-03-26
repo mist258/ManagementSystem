@@ -8,6 +8,7 @@ from core.models import db_helper
 
 from fastapi import Depends, FastAPI, HTTPException
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -24,7 +25,6 @@ main_app = FastAPI(lifespan=lifespan,
                    description="REST API for managing users and articles with role-based access control",
                    version="1.0.0",
                    )
-from sqlalchemy import text
 
 
 # liveness endpoint
