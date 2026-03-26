@@ -14,33 +14,34 @@ from sqlalchemy.orm import joinedload
 
 http_bearer = HTTPBearer()
 
+
 async def validate_auth_user(
     email: str = Form(),
     password: str = Form(),
-    db:AsyncSession = Depends(db_helper.session_getter)
+    db: AsyncSession = Depends(db_helper.session_getter),
 ) -> User:
     unauthed_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Incorrect email or password",
     )
-    result = await db.execute(
-        select(User).where(User.email == email)
-    )
+    result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
 
     if not user:
         raise unauthed_exception
 
     if not validate_password(
-            password=password,
-            hashed_password=user.hashed_password,
+        password=password,
+        hashed_password=user.hashed_password,
     ):
         raise unauthed_exception
 
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
+        )
     return user
+
 
 # get payload
 async def get_current_token_payload(
@@ -50,41 +51,39 @@ async def get_current_token_payload(
     try:
         payload = decode_jwt(token=token)
     except InvalidTokenError:
-       raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                           detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+        )
     return payload
 
 
-async def get_user_by_token_sub(
-        payload: dict,
-        db: AsyncSession
-) -> User:
+async def get_user_by_token_sub(payload: dict, db: AsyncSession) -> User:
 
     user_id = payload.get("sub")
 
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Invalid token")
-    result = await (db.execute(
-        select(User)
-        .options(
-            joinedload(User.profile)
-            .selectinload(UserProfile.articles)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
-        .where(User.id == int(user_id)))
+    result = await db.execute(
+        select(User)
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
+        .where(User.id == int(user_id))
     )
 
     user = result.scalar_one_or_none()
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
     return user
+
 
 # access token
 async def get_current_auth_user(
-        payload: dict = Depends(get_current_token_payload),
-        db: AsyncSession = Depends(db_helper.session_getter)
+    payload: dict = Depends(get_current_token_payload),
+    db: AsyncSession = Depends(db_helper.session_getter),
 ):
     validate_token_type(payload, ACCESS_TOKEN_TYPE)
     return await get_user_by_token_sub(payload, db)
@@ -92,8 +91,8 @@ async def get_current_auth_user(
 
 # refresh token
 async def get_current_auth_user_for_refresh(
-        payload: dict = Depends(get_current_token_payload),
-        db: AsyncSession = Depends(db_helper.session_getter)
+    payload: dict = Depends(get_current_token_payload),
+    db: AsyncSession = Depends(db_helper.session_getter),
 ):
     validate_token_type(payload, REFRESH_TOKEN_TYPE)
     return await get_user_by_token_sub(payload, db)
@@ -101,11 +100,10 @@ async def get_current_auth_user_for_refresh(
 
 # check is user authorized
 async def get_current_active_user(
-    user: UserRetrieveSchema = Depends(get_current_auth_user)
+    user: UserRetrieveSchema = Depends(get_current_auth_user),
 ) -> UserRetrieveSchema:
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
+        )
     return user
-
-

@@ -24,6 +24,7 @@ test_engine = create_async_engine(
     poolclass=NullPool,
 )
 
+
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def prepare_database():
     async with test_engine.begin() as conn:
@@ -31,6 +32,7 @@ async def prepare_database():
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
 
 @pytest_asyncio.fixture(scope="function")
 async def db_session():
@@ -54,25 +56,21 @@ async def create_test_user(db_session):
         hashed_password=hash_password("User123!"),
         is_active=True,
         is_staff=False,
-        is_superuser=False
+        is_superuser=False,
     )
     db_session.add(user)
     await db_session.flush()
 
-    profile = UserProfile(
-        user_id=user.id,
-        first_name="John",
-        last_name="Doe"
-    )
+    profile = UserProfile(user_id=user.id, first_name="John", last_name="Doe")
     db_session.add(profile)
     await db_session.commit()
     return user
 
+
 @pytest_asyncio.fixture
 async def auth_token(client: AsyncClient, create_test_user):
     login = await client.post(
-        "/api/v1/auth/login",
-        data={"email": "user1@test.com", "password": "User123!"}
+        "/api/v1/auth/login", data={"email": "user1@test.com", "password": "User123!"}
     )
     return login.json()["access_token"]
 
@@ -93,6 +91,7 @@ async def client(db_session):
 
     main_app.dependency_overrides.clear()
 
+
 @pytest_asyncio.fixture(scope="function")
 async def create_superuser(db_session):
     user = User(
@@ -100,7 +99,7 @@ async def create_superuser(db_session):
         hashed_password=hash_password("Admin123!"),
         is_active=True,
         is_staff=True,
-        is_superuser=True
+        is_superuser=True,
     )
     db_session.add(user)
     await db_session.flush()
@@ -113,7 +112,6 @@ async def create_superuser(db_session):
 @pytest_asyncio.fixture
 async def admin_token(client: AsyncClient, create_superuser):
     login = await client.post(
-        "/api/v1/auth/login",
-        data={"email": "admin@test.com", "password": "Admin123!"}
+        "/api/v1/auth/login", data={"email": "admin@test.com", "password": "Admin123!"}
     )
     return login.json()["access_token"]

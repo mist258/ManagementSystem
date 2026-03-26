@@ -20,11 +20,12 @@ async def lifespan(app: FastAPI):
     await db_helper.dispose()
 
 
-main_app = FastAPI(lifespan=lifespan,
-                   title="Management System API",
-                   description="REST API for managing users and articles with role-based access control",
-                   version="1.0.0",
-                   )
+main_app = FastAPI(
+    lifespan=lifespan,
+    title="Management System API",
+    description="REST API for managing users and articles with role-based access control",
+    version="1.0.0",
+)
 
 
 # liveness endpoint
@@ -32,19 +33,11 @@ main_app = FastAPI(lifespan=lifespan,
 async def health_check(db: AsyncSession = Depends(db_helper.session_getter)):
     try:
         await db.execute(text("SELECT 1"))
-        return {
-            "status": "ok",
-            "database": "ok"
-        }
+        return {"status": "ok", "database": "ok"}
     except Exception:
         raise HTTPException(
-            status_code=503,
-            detail={
-                "status": "error",
-                "database": "unavailable"
-            }
+            status_code=503, detail={"status": "error", "database": "unavailable"}
         )
 
-main_app.include_router(
-    api_router,
-    prefix=settings.api.prefix)
+
+main_app.include_router(api_router, prefix=settings.api.prefix)

@@ -9,9 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, declared_attr
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
-    metadata = MetaData(
-        naming_convention=settings.db.naming_convention
-    )
+    metadata = MetaData(naming_convention=settings.db.naming_convention)
 
     @declared_attr.directive
     def __tablename__(cls) -> str:

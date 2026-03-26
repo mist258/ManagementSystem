@@ -3,15 +3,14 @@ from httpx import AsyncClient
 
 async def test_create_article_success(client: AsyncClient, create_test_user):
     login = await client.post(
-        "/api/v1/auth/login",
-        data={"email": "user1@test.com", "password": "User123!"}
+        "/api/v1/auth/login", data={"email": "user1@test.com", "password": "User123!"}
     )
     token = login.json()["access_token"]
 
     response = await client.post(
         "/api/v1/articles",
         json={"title": "Test article", "content": "Test content"},
-        headers={"Authorization": f"Bearer {token}"}
+        headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 201
     assert response.json()["title"] == "Test article"
@@ -30,7 +29,6 @@ async def test_get_article_by_id_not_found(client: AsyncClient):
 
 async def test_create_article_unauthorized(client: AsyncClient):
     response = await client.post(
-        "/api/v1/articles",
-        json={"title": "Test", "content": "Content"}
+        "/api/v1/articles", json={"title": "Test", "content": "Content"}
     )
     assert response.status_code == 401

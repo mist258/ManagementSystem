@@ -1,6 +1,10 @@
 from api.articles.enums import ArticleSortField, SortOrder
 from api.articles.models import Article
-from api.articles.schemas import ArticleCreateSchema, ArticleFullResponseSchema, ArticleUpdateSchema
+from api.articles.schemas import (
+    ArticleCreateSchema,
+    ArticleFullResponseSchema,
+    ArticleUpdateSchema,
+)
 from api.articles.services import (
     create_article,
     delete_article,
@@ -24,78 +28,97 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 article_router = APIRouter()
 
-@article_router.get("", response_model=list[ArticleFullResponseSchema],
-                    summary="Get all articles",
-                    description="Available for anyone",
-                    status_code=status.HTTP_200_OK )
-async def get_articles(pagination: PaginationDep,
-        db: AsyncSession = Depends(db_helper.session_getter)
-                       ) -> list[Article]:
+
+@article_router.get(
+    "",
+    response_model=list[ArticleFullResponseSchema],
+    summary="Get all articles",
+    description="Available for anyone",
+    status_code=status.HTTP_200_OK,
+)
+async def get_articles(
+    pagination: PaginationDep, db: AsyncSession = Depends(db_helper.session_getter)
+) -> list[Article]:
     return await get_all_articles(pagination=pagination, db=db)
 
 
-@article_router.get("/search", response_model=list[ArticleFullResponseSchema],
-                    summary="Search articles",
-                    description="Search articles by title .Available for anyone",
-                    status_code=status.HTTP_200_OK )
-async def get_searched_articles(pagination: PaginationDep,
-                       db: AsyncSession = Depends(db_helper.session_getter),
-                       search: str | None = Query(None, description="Search for articles"),
-                       sort_by: ArticleSortField = Query(ArticleSortField.created_at),
-                       sort_order: SortOrder = Query(SortOrder.desc),
+@article_router.get(
+    "/search",
+    response_model=list[ArticleFullResponseSchema],
+    summary="Search articles",
+    description="Search articles by title .Available for anyone",
+    status_code=status.HTTP_200_OK,
+)
+async def get_searched_articles(
+    pagination: PaginationDep,
+    db: AsyncSession = Depends(db_helper.session_getter),
+    search: str | None = Query(None, description="Search for articles"),
+    sort_by: ArticleSortField = Query(ArticleSortField.created_at),
+    sort_order: SortOrder = Query(SortOrder.desc),
 ) -> list[Article]:
     return await search_articles(
         db=db,
         pagination=pagination,
         search=search,
         sort_by=sort_by,
-        sort_order=sort_order)
+        sort_order=sort_order,
+    )
 
 
-@article_router.post("", response_model=ArticleCreateSchema,
-                        summary="Create new article",
-                        description="Available for user as author or admin",
-                        status_code=status.HTTP_201_CREATED)
+@article_router.post(
+    "",
+    response_model=ArticleCreateSchema,
+    summary="Create new article",
+    description="Available for user as author or admin",
+    status_code=status.HTTP_201_CREATED,
+)
 async def post_new_article(
-        article: ArticleCreateSchema,
-        db: AsyncSession = Depends(db_helper.session_getter),
-        user: User = Depends(require_user_and_superuser)
+    article: ArticleCreateSchema,
+    db: AsyncSession = Depends(db_helper.session_getter),
+    user: User = Depends(require_user_and_superuser),
 ) -> Article:
     return await create_article(db, article, user)
 
 
-@article_router.put("/{article_id}", response_model=ArticleUpdateSchema,
-                    response_model_exclude_none=True,
-                    summary="Update article",
-                    description="Available for owner, editor and admin",
-                    status_code=status.HTTP_200_OK)
+@article_router.put(
+    "/{article_id}",
+    response_model=ArticleUpdateSchema,
+    response_model_exclude_none=True,
+    summary="Update article",
+    description="Available for owner, editor and admin",
+    status_code=status.HTTP_200_OK,
+)
 async def update_article_by_id(
-        article_id: int,
-        data : ArticleUpdateSchema,
-        db: AsyncSession = Depends(db_helper.session_getter),
-        user: User = Depends(require_article_owner_or_staff)
+    article_id: int,
+    data: ArticleUpdateSchema,
+    db: AsyncSession = Depends(db_helper.session_getter),
+    user: User = Depends(require_article_owner_or_staff),
 ) -> Article:
     return await update_article(db, article_id, data)
 
 
-@article_router.delete("/{article_id}",
-                        summary="Delete article",
-                        description="Delete article by id. Available for owner and admin",
-                        status_code=status.HTTP_204_NO_CONTENT)
+@article_router.delete(
+    "/{article_id}",
+    summary="Delete article",
+    description="Delete article by id. Available for owner and admin",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_article_by_id(
-        article_id: int,
-        db: AsyncSession = Depends(db_helper.session_getter),
-        user: User = Depends(require_article_owner_or_admin)
+    article_id: int,
+    db: AsyncSession = Depends(db_helper.session_getter),
+    user: User = Depends(require_article_owner_or_admin),
 ) -> None:
     return await delete_article(db, article_id)
 
 
-@article_router.get("/{article_id}", response_model=ArticleFullResponseSchema,
-                    summary="Get a single article",
-                    description="Available for anyone",
-                    status_code=status.HTTP_200_OK )
-async def get_single_article_by_id(article_id: int,
-                                   db: AsyncSession = Depends(db_helper.session_getter)
-                                   ) -> Article:
+@article_router.get(
+    "/{article_id}",
+    response_model=ArticleFullResponseSchema,
+    summary="Get a single article",
+    description="Available for anyone",
+    status_code=status.HTTP_200_OK,
+)
+async def get_single_article_by_id(
+    article_id: int, db: AsyncSession = Depends(db_helper.session_getter)
+) -> Article:
     return await get_article_by_id(db, article_id)
-

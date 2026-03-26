@@ -16,27 +16,32 @@ if TYPE_CHECKING:
 class UserRole(StrEnum):
     VIEWER = "viewer"
 
+
 class User(IdPkMixin, Base):
     """
-        User model representing users in the application
+    User model representing users in the application
     """
 
     hashed_password = mapped_column(String, nullable=False)
-    email: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
-        nullable=False
+    email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    role: Mapped[str | None] = mapped_column(
+        String(10), default=UserRole.VIEWER, nullable=True
     )
-    role: Mapped[str | None] = mapped_column(String(10), default=UserRole.VIEWER, nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True) # "True" for all roles in system (if is_active=False -> soft deletion )
-    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False) # "True" only for superuser
-    is_staff: Mapped[bool] = mapped_column(Boolean, default=False) # "True" for editor and superuser
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, default=True
+    )  # "True" for all roles in system (if is_active=False -> soft deletion )
+    is_superuser: Mapped[bool] = mapped_column(
+        Boolean, default=False
+    )  # "True" only for superuser
+    is_staff: Mapped[bool] = mapped_column(
+        Boolean, default=False
+    )  # "True" for editor and superuser
 
     profile: Mapped["UserProfile"] = relationship(
         "UserProfile",
         back_populates="user",
         uselist=False,
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
     )
 
     def __str__(self):
@@ -48,29 +53,18 @@ class User(IdPkMixin, Base):
 
 class UserProfile(IdPkMixin, TimestampMixin, Base):
     """
-        UserProfile model representing user's profile in the application
+    UserProfile model representing user's profile in the application
     """
 
     first_name: Mapped[str] = mapped_column(String(50), index=True)
     last_name: Mapped[str] = mapped_column(String(50), index=True)
 
     user_id: Mapped[int] = mapped_column(
-        Integer,
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE"
-    ),
-        unique=True,
-        nullable=False
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
     )
-    user: Mapped["User"] = relationship(
-        "User",
-         back_populates="profile"
-    )
+    user: Mapped["User"] = relationship("User", back_populates="profile")
     articles: Mapped[list["Article"]] = relationship(
-        "Article",
-        back_populates="author",
-        passive_deletes = True
+        "Article", back_populates="author", passive_deletes=True
     )
 
     def __str__(self):
@@ -78,4 +72,3 @@ class UserProfile(IdPkMixin, TimestampMixin, Base):
 
     def __repr__(self):
         return str(self)
-

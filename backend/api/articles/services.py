@@ -12,20 +12,16 @@ from sqlalchemy.orm.exc import StaleDataError
 
 
 async def create_article(
-        db:AsyncSession,
-        article: ArticleCreateSchema,
-        user:User
+    db: AsyncSession, article: ArticleCreateSchema, user: User
 ) -> Article:
     """
-        can create: user & superuser
-        :param: db[AsyncSession]
-        :param: article[schema]
-        :param: user
+    can create: user & superuser
+    :param: db[AsyncSession]
+    :param: article[schema]
+    :param: user
     """
     result = Article(
-        title=article.title,
-        content=article.content,
-        author_id=user.profile.id
+        title=article.title, content=article.content, author_id=user.profile.id
     )
     db.add(result)
     await db.commit()
@@ -34,24 +30,23 @@ async def create_article(
 
 
 async def update_article(
-        db:AsyncSession,
-        article_id: int,
-        data: ArticleUpdateSchema,
+    db: AsyncSession,
+    article_id: int,
+    data: ArticleUpdateSchema,
 ) -> Article:
     """
-        can update: owner & editor & superuser
-        :param: db[AsyncSession]
-        :param: article_id[int]
-        :param: data
+    can update: owner & editor & superuser
+    :param: db[AsyncSession]
+    :param: article_id[int]
+    :param: data
     """
-    result = await db.execute(
-        select(Article).where(Article.id == article_id)
-    )
+    result = await db.execute(select(Article).where(Article.id == article_id))
     article = result.scalar_one_or_none()
 
     if not article:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Article not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+        )
 
     if data.title is not None:
         article.title = data.title
@@ -62,82 +57,77 @@ async def update_article(
     try:
         await db.commit()
     except StaleDataError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail="Article was modified by someone else")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Article was modified by someone else",
+        )
     await db.refresh(article)
     return article
 
 
 async def delete_article(db: AsyncSession, article_id: int) -> None:
     """
-        can delete: owner & superuser
-        :param: db[AsyncSession]
-        :param: article_id[int]
+    can delete: owner & superuser
+    :param: db[AsyncSession]
+    :param: article_id[int]
     """
-    result = await db.execute(
-        select(Article).where(Article.id == article_id)
-    )
+    result = await db.execute(select(Article).where(Article.id == article_id))
 
     article = result.scalar_one_or_none()
 
     if not article:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Article not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+        )
 
     await db.delete(article)
     await db.commit()
 
 
 async def get_all_articles(
-        pagination: PaginationDep,
-        db: AsyncSession) -> list[Article]:
+    pagination: PaginationDep, db: AsyncSession
+) -> list[Article]:
     """
-        can get: anyone
-        :param: db[AsyncSession]
-        :param: pagination
+    can get: anyone
+    :param: db[AsyncSession]
+    :param: pagination
     """
     result = await db.execute(
-        select(Article)
-        .limit(pagination.limit)
-        .offset(pagination.offset)
+        select(Article).limit(pagination.limit).offset(pagination.offset)
     )
     return list(result.scalars().all())
 
 
-async def get_article_by_id(
-        db:AsyncSession,
-        article_id: int) -> Article:
+async def get_article_by_id(db: AsyncSession, article_id: int) -> Article:
     """
-        can get: anyone
-        :param: db[AsyncSession]
-        :param: article_id[int]
+    can get: anyone
+    :param: db[AsyncSession]
+    :param: article_id[int]
     """
-    result = await db.execute(
-        select(Article)
-        .where(Article.id == article_id)
-    )
+    result = await db.execute(select(Article).where(Article.id == article_id))
     article = result.scalar_one_or_none()
 
     if not article:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Article not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+        )
     return article
 
 
 async def search_articles(
-        db:AsyncSession,
-        pagination: PaginationDep,
-        search: str | None = None,
-        sort_by: ArticleSortField = ArticleSortField.created_at,
-        sort_order: SortOrder = SortOrder.desc,
+    db: AsyncSession,
+    pagination: PaginationDep,
+    search: str | None = None,
+    sort_by: ArticleSortField = ArticleSortField.created_at,
+    sort_order: SortOrder = SortOrder.desc,
 ) -> list[Article]:
     """
-        can get: anyone
-        :param: db[AsyncSession]
-        :param: pagination
-        :param: search[str] or None
-        :param: sort_by[ArticleSortField]
-        :param: sort_order[ArticleSortField]
+    can get: anyone
+    :param: db[AsyncSession]
+    :param: pagination
+    :param: search[str] or None
+    :param: sort_by[ArticleSortField]
+    :param: sort_order[ArticleSortField]
     """
 
     stmt = select(Article)
@@ -156,5 +146,3 @@ async def search_articles(
 
     result = await db.execute(stmt)
     return list(result.scalars().all())
-
-

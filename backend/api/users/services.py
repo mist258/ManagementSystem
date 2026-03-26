@@ -11,11 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 
-async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
+async def create_casual_user(db: AsyncSession, data: UserCreateSchema) -> User:
     """
-        can create: admin
-        :param: db[AsyncSession]
-        :param: data[schema]
+    can create: admin
+    :param: db[AsyncSession]
+    :param: data[schema]
     """
     try:
         db_user = User(
@@ -38,24 +38,22 @@ async def create_casual_user(db:AsyncSession, data: UserCreateSchema) -> User:
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
-            status_code=400,
-            detail="User with this email already exists"
+            status_code=400, detail="User with this email already exists"
         )
 
     result = await db.execute(
         select(User)
-        .options(joinedload(User.profile)
-                 .selectinload(UserProfile.articles))
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.id == db_user.id)
     )
     return result.scalar_one()
 
 
-async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
+async def create_editor(db: AsyncSession, data: UserCreateSchema) -> User:
     """
-        can create: admin
-        :param: db[AsyncSession]
-        :param: data[schema]
+    can create: admin
+    :param: db[AsyncSession]
+    :param: data[schema]
     """
 
     try:
@@ -79,53 +77,48 @@ async def create_editor(db:AsyncSession, data: UserCreateSchema ) -> User:
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
-            status_code=400,
-            detail="User with this email already exists"
+            status_code=400, detail="User with this email already exists"
         )
 
     result = await db.execute(
         select(User)
-        .options(joinedload(User.profile)
-                 .selectinload(UserProfile.articles))
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.id == db_user.id)
     )
     return result.scalar_one()
 
 
-async def get_all_users(db:AsyncSession,
-                        pagination: PaginationDep) -> list[User]:
+async def get_all_users(db: AsyncSession, pagination: PaginationDep) -> list[User]:
     """
-        return all users and a titles of their articles
-        can get: admin only
-        :param: db[AsyncSession]
-        :param: pagination
+    return all users and a titles of their articles
+    can get: admin only
+    :param: db[AsyncSession]
+    :param: pagination
     """
     result = await db.execute(
         select(User)
-        .options(
-            joinedload(User.profile)
-            .selectinload(UserProfile.articles)
-        )
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.is_staff.is_(False))
         .limit(pagination.limit)
         .offset(pagination.offset)
     )
-    return list(result.unique().scalars().all()) # 'unique()' because of 'joinedload()' can duplicate
+    return list(
+        result.unique().scalars().all()
+    )  # 'unique()' because of 'joinedload()' can duplicate
 
-async def get_all_users_editors(db:AsyncSession,
-                                pagination: PaginationDep) -> list[User]:
+
+async def get_all_users_editors(
+    db: AsyncSession, pagination: PaginationDep
+) -> list[User]:
     """
-        return all users and a titles of their articles
-        can get: admin only
-        :param: db[AsyncSession]
-        :param: pagination
+    return all users and a titles of their articles
+    can get: admin only
+    :param: db[AsyncSession]
+    :param: pagination
     """
     result = await db.execute(
         select(User)
-        .options(
-            joinedload(User.profile)
-            .selectinload(UserProfile.articles)
-        )
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.is_staff)
         .where(User.is_superuser.is_(False))
         .limit(pagination.limit)
@@ -133,18 +126,16 @@ async def get_all_users_editors(db:AsyncSession,
     )
     return list(result.unique().scalars().all())
 
+
 async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     """
-        can get: admin only
-        :param: db[AsyncSession]
-        :param: user_id[int]
+    can get: admin only
+    :param: db[AsyncSession]
+    :param: user_id[int]
     """
     result = await db.execute(
         select(User)
-        .options(
-            joinedload(User.profile)
-            .selectinload(UserProfile.articles)
-        )
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.id == user_id)
     )
     user = result.scalar_one_or_none()
@@ -154,19 +145,19 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     return user
 
 
-async def update_user(data: UserUpdateSchema, db: AsyncSession, user_id: int, ) -> User:
+async def update_user(
+    data: UserUpdateSchema,
+    db: AsyncSession,
+    user_id: int,
+) -> User:
     """
-        can update: admin & account's owner
-        :param: db[AsyncSession]
-        :param: user_id[int]
-        :param: data[schema]
+    can update: admin & account's owner
+    :param: db[AsyncSession]
+    :param: user_id[int]
+    :param: data[schema]
     """
     result = await db.execute(
-        select(User)
-        .options(
-            joinedload(User.profile)
-        )
-        .where(User.id == user_id)
+        select(User).options(joinedload(User.profile)).where(User.id == user_id)
     )
     user = result.scalar_one_or_none()
 
@@ -188,13 +179,12 @@ async def update_user(data: UserUpdateSchema, db: AsyncSession, user_id: int, ) 
     return user
 
 
-async def delete_user(db: AsyncSession,
-                      user_id: int) -> None:
+async def delete_user(db: AsyncSession, user_id: int) -> None:
     """
-        Delete user
-        can delete: admin only
-        :param: db[AsyncSession]
-        :param: user_id[int]
+    Delete user
+    can delete: admin only
+    :param: db[AsyncSession]
+    :param: user_id[int]
     """
     result = select(User).where(User.id == user_id)
     user = await db.scalar(result)
@@ -206,19 +196,15 @@ async def delete_user(db: AsyncSession,
     await db.commit()
 
 
-async def block_user(db: AsyncSession, user_id: int) -> User: # soft deletion
+async def block_user(db: AsyncSession, user_id: int) -> User:  # soft deletion
     """
-        Deactivate user
-        can deactivate: admin only
-        :param: db[AsyncSession]
-        :param: user_id[int]
+    Deactivate user
+    can deactivate: admin only
+    :param: db[AsyncSession]
+    :param: user_id[int]
     """
     result = await db.execute(
-        select(User)
-        .options(
-            joinedload(User.profile)
-        )
-        .where(User.id == user_id)
+        select(User).options(joinedload(User.profile)).where(User.id == user_id)
     )
     user = result.scalar_one_or_none()
 
@@ -239,17 +225,13 @@ async def block_user(db: AsyncSession, user_id: int) -> User: # soft deletion
 
 async def unblock_user(db: AsyncSession, user_id: int) -> User:
     """
-        Unblock user
-        can unblock: admin only
-        :param user_id:
-        :return: unblocked user
+    Unblock user
+    can unblock: admin only
+    :param user_id:
+    :return: unblocked user
     """
     result = await db.execute(
-        select(User)
-        .options(
-            joinedload(User.profile)
-        )
-        .where(User.id == user_id)
+        select(User).options(joinedload(User.profile)).where(User.id == user_id)
     )
     user = result.scalar_one_or_none()
     if not user:
@@ -262,6 +244,7 @@ async def unblock_user(db: AsyncSession, user_id: int) -> User:
     await db.commit()
     await db.refresh(user)
     return user
+
 
 async def search_users_by_name(
     db: AsyncSession,
@@ -277,17 +260,14 @@ async def search_users_by_name(
     stmt = (
         select(User)
         .join(User.profile)
-        .options(
-            joinedload(User.profile)
-            .selectinload(UserProfile.articles)
-        )
+        .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.is_staff.is_(False))
     )
     if search:
         stmt = stmt.where(
             or_(
                 UserProfile.first_name.ilike(f"%{search}%"),
-                UserProfile.last_name.ilike(f"%{search}%")
+                UserProfile.last_name.ilike(f"%{search}%"),
             )
         )
     stmt = stmt.limit(pagination.limit).offset(pagination.offset)

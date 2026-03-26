@@ -11,10 +11,11 @@ ACCESS_TOKEN_TYPE = "access"
 REFRESH_TOKEN_TYPE = "refresh"
 
 
-def create_jwt_token(token_type: str,
-                     payload: dict,
-                     expire_timedelta: timedelta | None = None,
-                     expire_minutes: int = settings.auth_jwt.access_token_expire_minutes,
+def create_jwt_token(
+    token_type: str,
+    payload: dict,
+    expire_timedelta: timedelta | None = None,
+    expire_minutes: int = settings.auth_jwt.access_token_expire_minutes,
 ) -> str:
     """
     :param: token_type
@@ -33,40 +34,45 @@ def create_jwt_token(token_type: str,
 
 def create_access_token(user: UserLoginSchema) -> str:
     """
-        create access token
-        :param: user[schema]
+    create access token
+    :param: user[schema]
     """
     jwt_payload = {
         "sub": str(user.id),
         "email": user.email,
     }
-    return create_jwt_token(token_type=ACCESS_TOKEN_TYPE,
-                            payload=jwt_payload,
-                            expire_minutes=settings.auth_jwt.access_token_expire_minutes)
+    return create_jwt_token(
+        token_type=ACCESS_TOKEN_TYPE,
+        payload=jwt_payload,
+        expire_minutes=settings.auth_jwt.access_token_expire_minutes,
+    )
 
 
 def create_refresh_token(user: UserLoginSchema) -> str:
     """
-        create refresh token
-        :param: user[schema]
+    create refresh token
+    :param: user[schema]
     """
 
     jwt_payload = {
         "sub": str(user.id),
         "email": user.email,
     }
-    return create_jwt_token(token_type=REFRESH_TOKEN_TYPE,
-                            payload=jwt_payload,
-                            expire_timedelta=timedelta(days=settings.auth_jwt.refresh_token_expire_minutes))
+    return create_jwt_token(
+        token_type=REFRESH_TOKEN_TYPE,
+        payload=jwt_payload,
+        expire_timedelta=timedelta(days=settings.auth_jwt.refresh_token_expire_minutes),
+    )
 
 
 def validate_token_type(payload: dict, token_type: str) -> bool:
     """
-        validate token type
-        :param:
-        :param:
+    validate token type
+    :param:
+    :param:
     """
     if payload.get(TOKEN_TYPE_FIELD) == token_type:
         return True
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Incorrect token type")
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect token type"
+    )

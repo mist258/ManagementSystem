@@ -17,15 +17,19 @@ class ApiPrefix(BaseModel):
 
 
 class AuthJWT(BaseModel):
-    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem" # directory "certs" should be created in root of the project (on the same level with Dockerfile and .env)
+    private_key_path: Path = (
+        BASE_DIR / "certs" / "jwt-private.pem"
+    )  # directory "certs" should be created in root of the project (on the same level with Dockerfile and .env)
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
-    algorithm: str = "RS256" # encryption algorithm
+    algorithm: str = "RS256"  # encryption algorithm
     access_token_expire_minutes: int = 15
     refresh_token_expire_minutes: int = 60 * 24 * 2
+
 
 # for tests
 class DatabaseTestConfig(BaseSettings):
     url: PostgresDsn
+
 
 class DatabaseConfig(BaseSettings):
     url: PostgresDsn
@@ -39,7 +43,7 @@ class DatabaseConfig(BaseSettings):
         "uq": "uq_%(table_name)s_%(column_0_name)s",
         "ck": "ck_%(table_name)s_%(constraint_name)s",
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-        "pk": "pk_%(table_name)s"
+        "pk": "pk_%(table_name)s",
     }
 
 
@@ -56,5 +60,6 @@ class Settings(BaseSettings):
     db: DatabaseConfig
     auth_jwt: AuthJWT = AuthJWT()
     db_test: DatabaseTestConfig | None = None
+
 
 settings = Settings()  # ty: ignore[missing-argument]

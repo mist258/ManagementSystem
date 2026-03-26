@@ -23,11 +23,13 @@ class UserRetrieveSchema(BaseModel):
     is_superuser: bool
     profile: UserProfileRetrieveSchema
 
+
 # for editor
 class EditorProfileRetrieveSchema(BaseModel):
     id: int
     first_name: str
     last_name: str
+
 
 class EditorRetrieveSchema(BaseModel):
     id: int
@@ -48,37 +50,41 @@ class UserCreateSchema(BaseModel):
     hashed_password: str
     profile: UserProfileSchema
 
-    @field_validator('email')
+    @field_validator("email")
     @classmethod
     def normalize_email(cls, email: EmailStr) -> EmailStr:
 
-        email_name, domain_part = email.strip().rsplit('@', 1)
+        email_name, domain_part = email.strip().rsplit("@", 1)
         email = email_name + "@" + domain_part.lower()
         return email
 
-    @field_validator('hashed_password')
+    @field_validator("hashed_password")
     @classmethod
     def validate_received_password(cls, password: str) -> str:
 
         pattern = r"^[A-Za-z\d@$!%*?&]{8,}$"
 
         if not re.fullmatch(pattern, password):
-            raise ValueError('Password must contain at least 8 characters,'
-                                    '1 special symbol, 1 letter, 1 number')
+            raise ValueError(
+                "Password must contain at least 8 characters,"
+                "1 special symbol, 1 letter, 1 number"
+            )
         return password
+
 
 # update user
 class UserUpdateSchema(BaseModel):
     email: EmailStr
     profile: UserProfileSchema
 
-    @field_validator('email')
+    @field_validator("email")
     @classmethod
     def normalize_email(cls, email: EmailStr) -> EmailStr:
 
-        email_name, domain_part = email.strip().rsplit('@', 1)
+        email_name, domain_part = email.strip().rsplit("@", 1)
         email = email_name + "@" + domain_part.lower()
         return email
+
 
 # for blocked user
 class UserProfileBlockSchema(BaseModel):
@@ -87,4 +93,3 @@ class UserProfileBlockSchema(BaseModel):
     role: str
     is_active: bool
     is_staff: bool
-

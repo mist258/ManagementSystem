@@ -9,6 +9,7 @@ Create Date: 2026-02-28 19:50:34.535570
 from typing import Sequence, Union
 
 from alembic import op
+
 import sqlalchemy as sa
 
 revision: str = "ecfef26c78dd"
@@ -102,9 +103,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_articles")),
     )
-    op.create_index(
-        op.f("ix_articles_title"), "articles", ["title"], unique=False
-    )
+    op.create_index(op.f("ix_articles_title"), "articles", ["title"], unique=False)
     op.create_index(
         op.f("ix_articles_updated_at"),
         "articles",
@@ -118,14 +117,8 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_articles_updated_at"), table_name="articles")
     op.drop_index(op.f("ix_articles_title"), table_name="articles")
     op.drop_table("articles")
-    op.drop_index(
-        op.f("ix_user_profiles_updated_at"), table_name="user_profiles"
-    )
-    op.drop_index(
-        op.f("ix_user_profiles_last_name"), table_name="user_profiles"
-    )
-    op.drop_index(
-        op.f("ix_user_profiles_first_name"), table_name="user_profiles"
-    )
+    op.drop_index(op.f("ix_user_profiles_updated_at"), table_name="user_profiles")
+    op.drop_index(op.f("ix_user_profiles_last_name"), table_name="user_profiles")
+    op.drop_index(op.f("ix_user_profiles_first_name"), table_name="user_profiles")
     op.drop_table("user_profiles")
     op.drop_table("users")
