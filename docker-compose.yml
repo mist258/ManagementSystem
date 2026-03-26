@@ -9,7 +9,7 @@ services:
       - ./backend/certs:/app/certs
     env_file: .env
     command: >
-      sh -c "uvicorn main:main_app --host 0.0.0.0 --port 8002 --reload"
+      sh -c "/venv/bin/uvicorn main:main_app --host 0.0.0.0 --port 8002 --reload"
     depends_on:
       - db
       - db_test

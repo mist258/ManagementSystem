@@ -1,15 +1,17 @@
 FROM python:3.13-slim-bookworm
 
-MAINTAINER python dev
+LABEL maintainer="python dev"
+
+ENV UV_NO_DEV=1
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=OFF \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=1.8.2 \
-    POETRY_NO_INTERACTION=1 \
-    COLUMNS=80
+    PIP_DEFAULT_TIMEOUT=100
+
+ENV UV_PROJECT_ENVIRONMENT=/venv
+
 
 RUN apt-get update \
     && apt-get install -y \
@@ -19,15 +21,20 @@ RUN apt-get update \
         postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-ENV POETRY_HOME=/usr/local/poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH=$POETRY_HOME/bin:$PATH
 
-COPY pyproject.toml /app/
+ENV PATH="/app/.venv/bin:$PATH"
 
-RUN poetry config virtualenvs.create false\
-    && poetry lock \
-    && poetry install
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-workspace
+
+
+COPY pyproject.toml uv.lock /app/
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
