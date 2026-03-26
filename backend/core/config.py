@@ -57,4 +57,4 @@ class Settings(BaseSettings):
     auth_jwt: AuthJWT = AuthJWT()
     db_test: DatabaseTestConfig | None = None
 
-settings = Settings()
+settings = Settings()  # ty: ignore[missing-argument]

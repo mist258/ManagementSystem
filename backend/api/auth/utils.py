@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import bcrypt
 import jwt
@@ -18,7 +18,7 @@ def encode_jwt(
         Create JWT token
     """
     to_encode = payload.copy()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if expire_timedelta:
         expire = now + expire_timedelta
 
@@ -41,7 +41,7 @@ def decode_jwt(
         token: str | bytes,
         public_key: str = settings.auth_jwt.public_key_path.read_text(),
         algorithm: str = settings.auth_jwt.algorithm
-) -> str:
+) -> dict:
     """
         Decode JWT token
     """

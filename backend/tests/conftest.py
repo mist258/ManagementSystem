@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 
+assert settings.db_test is not None
 test_engine = create_async_engine(
     str(settings.db_test.url),
     echo=False,
