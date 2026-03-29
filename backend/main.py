@@ -34,10 +34,11 @@ async def health_check(db: AsyncSession = Depends(db_helper.session_getter)):
     try:
         await db.execute(text("SELECT 1"))
         return {"status": "ok", "database": "ok"}
-    except Exception:
+    except Exception as err:
         raise HTTPException(
-            status_code=503, detail={"status": "error", "database": "unavailable"}
-        )
+            status_code=503,
+            detail={"status": "error", "database": "unavailable"},
+        ) from err
 
 
 main_app.include_router(api_router, prefix=settings.api.prefix)

@@ -35,16 +35,15 @@ async def create_casual_user(db: AsyncSession, data: UserCreateSchema) -> User:
         db.add(db_profile)
         await db.commit()
 
-    except IntegrityError:
+    except IntegrityError as err:
         await db.rollback()
         raise HTTPException(
-            status_code=400, detail="User with this email already exists"
-        )
+            status_code=400,
+            detail="User with this email already exists",
+        ) from err
 
     result = await db.execute(
-        select(User)
-        .options(joinedload(User.profile).selectinload(UserProfile.articles))
-        .where(User.id == db_user.id)
+        select(User).options(joinedload(User.profile).selectinload(UserProfile.articles)).where(User.id == db_user.id),
     )
     return result.scalar_one()
 
@@ -74,16 +73,15 @@ async def create_editor(db: AsyncSession, data: UserCreateSchema) -> User:
         db.add(db_profile)
         await db.commit()
 
-    except IntegrityError:
+    except IntegrityError as err:
         await db.rollback()
         raise HTTPException(
-            status_code=400, detail="User with this email already exists"
-        )
+            status_code=400,
+            detail="User with this email already exists",
+        ) from err
 
     result = await db.execute(
-        select(User)
-        .options(joinedload(User.profile).selectinload(UserProfile.articles))
-        .where(User.id == db_user.id)
+        select(User).options(joinedload(User.profile).selectinload(UserProfile.articles)).where(User.id == db_user.id),
     )
     return result.scalar_one()
 
@@ -100,15 +98,16 @@ async def get_all_users(db: AsyncSession, pagination: PaginationDep) -> list[Use
         .options(joinedload(User.profile).selectinload(UserProfile.articles))
         .where(User.is_staff.is_(False))
         .limit(pagination.limit)
-        .offset(pagination.offset)
+        .offset(pagination.offset),
     )
     return list(
-        result.unique().scalars().all()
+        result.unique().scalars().all(),
     )  # 'unique()' because of 'joinedload()' can duplicate
 
 
 async def get_all_users_editors(
-    db: AsyncSession, pagination: PaginationDep
+    db: AsyncSession,
+    pagination: PaginationDep,
 ) -> list[User]:
     """
     return all users and a titles of their articles
@@ -122,7 +121,7 @@ async def get_all_users_editors(
         .where(User.is_staff)
         .where(User.is_superuser.is_(False))
         .limit(pagination.limit)
-        .offset(pagination.offset)
+        .offset(pagination.offset),
     )
     return list(result.unique().scalars().all())
 
@@ -134,9 +133,7 @@ async def get_user_by_id(db: AsyncSession, user_id: int) -> User:
     :param: user_id[int]
     """
     result = await db.execute(
-        select(User)
-        .options(joinedload(User.profile).selectinload(UserProfile.articles))
-        .where(User.id == user_id)
+        select(User).options(joinedload(User.profile).selectinload(UserProfile.articles)).where(User.id == user_id),
     )
     user = result.scalar_one_or_none()
 
@@ -157,7 +154,7 @@ async def update_user(
     :param: data[schema]
     """
     result = await db.execute(
-        select(User).options(joinedload(User.profile)).where(User.id == user_id)
+        select(User).options(joinedload(User.profile)).where(User.id == user_id),
     )
     user = result.scalar_one_or_none()
 
@@ -204,7 +201,7 @@ async def block_user(db: AsyncSession, user_id: int) -> User:  # soft deletion
     :param: user_id[int]
     """
     result = await db.execute(
-        select(User).options(joinedload(User.profile)).where(User.id == user_id)
+        select(User).options(joinedload(User.profile)).where(User.id == user_id),
     )
     user = result.scalar_one_or_none()
 
@@ -231,7 +228,7 @@ async def unblock_user(db: AsyncSession, user_id: int) -> User:
     :return: unblocked user
     """
     result = await db.execute(
-        select(User).options(joinedload(User.profile)).where(User.id == user_id)
+        select(User).options(joinedload(User.profile)).where(User.id == user_id),
     )
     user = result.scalar_one_or_none()
     if not user:
@@ -268,7 +265,7 @@ async def search_users_by_name(
             or_(
                 UserProfile.first_name.ilike(f"%{search}%"),
                 UserProfile.last_name.ilike(f"%{search}%"),
-            )
+            ),
         )
     stmt = stmt.limit(pagination.limit).offset(pagination.offset)
     result = await db.execute(stmt)

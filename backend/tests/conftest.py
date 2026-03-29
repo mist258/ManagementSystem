@@ -70,7 +70,8 @@ async def create_test_user(db_session):
 @pytest_asyncio.fixture
 async def auth_token(client: AsyncClient, create_test_user):
     login = await client.post(
-        "/api/v1/auth/login", data={"email": "user1@test.com", "password": "User123!"}
+        "/api/v1/auth/login",
+        data={"email": "user1@test.com", "password": "User123!"},
     )
     return login.json()["access_token"]
 
@@ -112,6 +113,7 @@ async def create_superuser(db_session):
 @pytest_asyncio.fixture
 async def admin_token(client: AsyncClient, create_superuser):
     login = await client.post(
-        "/api/v1/auth/login", data={"email": "admin@test.com", "password": "Admin123!"}
+        "/api/v1/auth/login",
+        data={"email": "admin@test.com", "password": "Admin123!"},
     )
     return login.json()["access_token"]

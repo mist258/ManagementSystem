@@ -12,7 +12,9 @@ from sqlalchemy.orm.exc import StaleDataError
 
 
 async def create_article(
-    db: AsyncSession, article: ArticleCreateSchema, user: User
+    db: AsyncSession,
+    article: ArticleCreateSchema,
+    user: User,
 ) -> Article:
     """
     can create: user & superuser
@@ -21,7 +23,9 @@ async def create_article(
     :param: user
     """
     result = Article(
-        title=article.title, content=article.content, author_id=user.profile.id
+        title=article.title,
+        content=article.content,
+        author_id=user.profile.id,
     )
     db.add(result)
     await db.commit()
@@ -45,7 +49,8 @@ async def update_article(
 
     if not article:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
         )
 
     if data.title is not None:
@@ -56,11 +61,11 @@ async def update_article(
 
     try:
         await db.commit()
-    except StaleDataError:
+    except StaleDataError as err:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Article was modified by someone else",
-        )
+        ) from err
     await db.refresh(article)
     return article
 
@@ -77,7 +82,8 @@ async def delete_article(db: AsyncSession, article_id: int) -> None:
 
     if not article:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
         )
 
     await db.delete(article)
@@ -85,7 +91,8 @@ async def delete_article(db: AsyncSession, article_id: int) -> None:
 
 
 async def get_all_articles(
-    pagination: PaginationDep, db: AsyncSession
+    pagination: PaginationDep,
+    db: AsyncSession,
 ) -> list[Article]:
     """
     can get: anyone
@@ -93,7 +100,7 @@ async def get_all_articles(
     :param: pagination
     """
     result = await db.execute(
-        select(Article).limit(pagination.limit).offset(pagination.offset)
+        select(Article).limit(pagination.limit).offset(pagination.offset),
     )
     return list(result.scalars().all())
 
@@ -109,7 +116,8 @@ async def get_article_by_id(db: AsyncSession, article_id: int) -> Article:
 
     if not article:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
         )
     return article
 

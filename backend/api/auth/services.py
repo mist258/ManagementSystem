@@ -74,5 +74,6 @@ def validate_token_type(payload: dict, token_type: str) -> bool:
     if payload.get(TOKEN_TYPE_FIELD) == token_type:
         return True
     raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect token type"
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Incorrect token type",
     )

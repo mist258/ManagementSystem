@@ -37,7 +37,8 @@ article_router = APIRouter()
     status_code=status.HTTP_200_OK,
 )
 async def get_articles(
-    pagination: PaginationDep, db: AsyncSession = Depends(db_helper.session_getter)
+    pagination: PaginationDep,
+    db: AsyncSession = Depends(db_helper.session_getter),
 ) -> list[Article]:
     return await get_all_articles(pagination=pagination, db=db)
 
@@ -119,6 +120,7 @@ async def delete_article_by_id(
     status_code=status.HTTP_200_OK,
 )
 async def get_single_article_by_id(
-    article_id: int, db: AsyncSession = Depends(db_helper.session_getter)
+    article_id: int,
+    db: AsyncSession = Depends(db_helper.session_getter),
 ) -> Article:
     return await get_article_by_id(db, article_id)

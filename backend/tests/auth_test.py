@@ -17,7 +17,8 @@ async def test_login_success(db_session, client):
 
     # робимо запит на login
     response = await client.post(
-        "/api/v1/auth/login", data={"email": "user1@test.com", "password": "User123!"}
+        "/api/v1/auth/login",
+        data={"email": "user1@test.com", "password": "User123!"},
     )
 
     assert response.status_code == 200

@@ -1,5 +1,4 @@
 import re
-from typing import List
 
 from api.articles.schemas import ArticleTitleSchema
 
@@ -11,7 +10,7 @@ class UserProfileRetrieveSchema(BaseModel):
     id: int
     first_name: str
     last_name: str
-    articles: List[ArticleTitleSchema] = []
+    articles: list[ArticleTitleSchema] = []
 
 
 class UserRetrieveSchema(BaseModel):
@@ -66,8 +65,7 @@ class UserCreateSchema(BaseModel):
 
         if not re.fullmatch(pattern, password):
             raise ValueError(
-                "Password must contain at least 8 characters,"
-                "1 special symbol, 1 letter, 1 number"
+                "Password must contain at least 8 characters,1 special symbol, 1 letter, 1 number",
             )
         return password
 

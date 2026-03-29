@@ -38,7 +38,8 @@ async def validate_auth_user(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user",
         )
     return user
 
@@ -50,10 +51,11 @@ async def get_current_token_payload(
     token = credentials.credentials
     try:
         payload = decode_jwt(token=token)
-    except InvalidTokenError:
+    except InvalidTokenError as err:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-        )
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        ) from err
     return payload
 
 
@@ -63,19 +65,21 @@ async def get_user_by_token_sub(payload: dict, db: AsyncSession) -> User:
 
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
         )
     result = await db.execute(
         select(User)
         .options(joinedload(User.profile).selectinload(UserProfile.articles))
-        .where(User.id == int(user_id))
+        .where(User.id == int(user_id)),
     )
 
     user = result.scalar_one_or_none()
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
         )
     return user
 
@@ -104,6 +108,7 @@ async def get_current_active_user(
 ) -> UserRetrieveSchema:
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user",
         )
     return user

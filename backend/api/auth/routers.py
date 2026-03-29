@@ -25,7 +25,8 @@ auth_router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def sign_up(
-    data: UserCreateSchema, db: AsyncSession = Depends(db_helper.session_getter)
+    data: UserCreateSchema,
+    db: AsyncSession = Depends(db_helper.session_getter),
 ) -> User:
     return await create_casual_user(db=db, data=data)
 

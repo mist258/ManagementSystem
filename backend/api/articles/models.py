@@ -19,14 +19,19 @@ class Article(IdPkMixin, TimestampMixin, Base):
 
     title: Mapped[str] = mapped_column(String(70), index=True, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    author: Mapped["UserProfile"] = relationship(
-        "UserProfile", back_populates="articles"
+    author: Mapped[UserProfile] = relationship(
+        "UserProfile",
+        back_populates="articles",
     )
     author_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user_profiles.id", ondelete="SET NULL"), nullable=True
+        Integer,
+        ForeignKey("user_profiles.id", ondelete="SET NULL"),
+        nullable=True,
     )
     version: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=1
+        Integer,
+        nullable=False,
+        default=1,
     )  # field for optimistic locking
 
     # SQLAlchemy indicates that the model supports optimistic locking via this column

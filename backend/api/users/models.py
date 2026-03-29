@@ -25,19 +25,24 @@ class User(IdPkMixin, Base):
     hashed_password = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     role: Mapped[str | None] = mapped_column(
-        String(10), default=UserRole.VIEWER, nullable=True
+        String(10),
+        default=UserRole.VIEWER,
+        nullable=True,
     )
     is_active: Mapped[bool] = mapped_column(
-        Boolean, default=True
+        Boolean,
+        default=True,
     )  # "True" for all roles in system (if is_active=False -> soft deletion )
     is_superuser: Mapped[bool] = mapped_column(
-        Boolean, default=False
+        Boolean,
+        default=False,
     )  # "True" only for superuser
     is_staff: Mapped[bool] = mapped_column(
-        Boolean, default=False
+        Boolean,
+        default=False,
     )  # "True" for editor and superuser
 
-    profile: Mapped["UserProfile"] = relationship(
+    profile: Mapped[UserProfile] = relationship(
         "UserProfile",
         back_populates="user",
         uselist=False,
@@ -60,11 +65,16 @@ class UserProfile(IdPkMixin, TimestampMixin, Base):
     last_name: Mapped[str] = mapped_column(String(50), index=True)
 
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
     )
-    user: Mapped["User"] = relationship("User", back_populates="profile")
-    articles: Mapped[list["Article"]] = relationship(
-        "Article", back_populates="author", passive_deletes=True
+    user: Mapped[User] = relationship("User", back_populates="profile")
+    articles: Mapped[list[Article]] = relationship(
+        "Article",
+        back_populates="author",
+        passive_deletes=True,
     )
 
     def __str__(self):

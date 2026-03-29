@@ -43,7 +43,9 @@ async def _create_superuser(first_name: str, last_name: str, email: str, passwor
             await db.flush()
 
             profile = UserProfile(
-                user_id=user.id, first_name=first_name, last_name=last_name
+                user_id=user.id,
+                first_name=first_name,
+                last_name=last_name,
             )
             db.add(profile)
             await db.commit()

@@ -39,13 +39,19 @@ async def _seed():
             await db.flush()
 
             editor_profile = UserProfile(
-                user_id=editor.id, first_name="John", last_name="Smith"
+                user_id=editor.id,
+                first_name="John",
+                last_name="Smith",
             )
             user1_profile = UserProfile(
-                user_id=user1.id, first_name="Nick", last_name="Han"
+                user_id=user1.id,
+                first_name="Nick",
+                last_name="Han",
             )
             user2_profile = UserProfile(
-                user_id=user2.id, first_name="Jane", last_name="Bush"
+                user_id=user2.id,
+                first_name="Jane",
+                last_name="Bush",
             )
             db.add_all([editor_profile, user1_profile, user2_profile])
             await db.flush()

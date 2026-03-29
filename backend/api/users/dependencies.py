@@ -15,7 +15,8 @@ async def require_user_and_superuser(
 ) -> User:
     if user.is_staff and not user.is_superuser:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Permission denied"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Permission denied",
         )
     return user
 
@@ -32,17 +33,17 @@ async def require_article_owner_or_staff(
 
     if not article:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
         )
 
-    if (user.is_staff and user.is_superuser) or (
-        user.is_staff and not user.is_superuser
-    ):
+    if (user.is_staff and user.is_superuser) or (user.is_staff and not user.is_superuser):
         return user
 
     if article.author_id != user.profile.id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not your article"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not your article",
         )
 
     return user
@@ -60,19 +61,22 @@ async def require_article_owner_or_admin(
 
     if not article:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
         )
     if user.is_superuser:
         return user
 
     if user.is_staff:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Permission denied"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Permission denied",
         )
 
     if article.author_id != user.profile.id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not your article"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not your article",
         )
 
     return user
@@ -82,21 +86,24 @@ async def require_article_owner_or_admin(
 async def require_superuser(user: User = Depends(get_current_active_user)) -> User:
     if not user.is_superuser:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Permission denied"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Permission denied",
         )
     return user
 
 
 # owner or admin only
 async def require_owner_or_superuser(
-    user_id: int, current_user: User = Depends(get_current_active_user)
+    user_id: int,
+    current_user: User = Depends(get_current_active_user),
 ) -> User:
     if current_user.is_superuser:
         return current_user
 
     if current_user.id != user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied",
         )
 
     return current_user
